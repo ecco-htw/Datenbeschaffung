@@ -39,9 +39,10 @@ object RunProcedure {
 
   def main(args: Array[String]) {
     //saveAllFromThisWeekList
-    val actorSystem = ActorSystem("eccoActorSystem")
+    //val actorSystem = ActorSystem("eccoActorSystem")
     
-    val ftpObserver = actorSystem.actorOf(FtpObserver.props(saveAllFromThisWeekList), "ftpObserver")
+    //val ftpObserver = actorSystem.actorOf(FtpObserver.props(saveAllFromThisWeekList), "ftpObserver")
+    saveAllFromThisWeekList()
     //sc.stop()
     //spark.stop()
   }
@@ -57,6 +58,7 @@ object RunProcedure {
     val rootFTP = buoy_list.getRootFTP
     val weeklist= buoy_list.toRDD.map(row => rootFTP + "/" + row.getString(0)).collect().toList
     weeklist.foreach(saveDataMongoDB)
+    //saveDataMongoDB(weeklist.head)
   }
 
   /** Store argo-data in mongodb of one specific NetCDF file.
@@ -64,14 +66,20 @@ object RunProcedure {
     * @param filename NetCDF file path.
     */
   def saveDataMongoDB(filename: String): Unit = {
+    val time=System.currentTimeMillis()
     val bd = new BuoyData(filename)
     val bdDF = bd.getDF(sc, spark.sqlContext)
+    bdDF.take(1).foreach(println)
     val extractCurrentParams = bdDF.select("parameter").first.get(0).asInstanceOf[Seq[Seq[String]]].flatten
     val selectColumns = extractCurrentParams ++ Seq("floatSerialNo", "longitude", "latitude", "platformNumber", "projectName", "juld",
       "platformType", "configMissionNumber", "cycleNumber")
+    println((System.currentTimeMillis()-time)/1000+"s")
+
+    /*
     bdDF.select(selectColumns.head, selectColumns.tail: _*).write.
       format("com.mongodb.spark.sql.DefaultSource").mode("append").
       save()
+      */
   }
 
 }
