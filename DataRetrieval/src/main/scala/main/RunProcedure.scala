@@ -31,7 +31,7 @@ object RunProcedure {
     .setAppName("HTW-Argo")
     //.set("spark.executor.memory", "471m")
     .set("spark.ui.port", "4050")
-    .set("spark.mongodb.output.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.buoyTestAll")
+    .set("spark.mongodb.output.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.buoyTestAll3")
     .set("spark.mongodb.input.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.buoy?readPreference=primaryPreferred")
   val sc = new SparkContext(conf)
   val spark = SparkSession
@@ -42,7 +42,7 @@ object RunProcedure {
 
   def main(args: Array[String]) {
 
-    val buoyList = GlobalList(sc, spark.sqlContext)
+    val buoyList = new GlobalList(sc, spark.sqlContext)
 
 //    val buoyList = GlobalList(sc, spark.sqlContext).contentRDD
 
@@ -93,7 +93,7 @@ object RunProcedure {
 
     //weeklist.foreach(println)
     //weeklist.foreach(saveDataMongoDB)
-    saveDataMongoDB(weeklist.head)
+//    saveDataMongoDB(weeklist.head)
   }
 
   /** Store argo-data in mongodb of one specific NetCDF file.
@@ -103,9 +103,14 @@ object RunProcedure {
   def saveDataMongoDB(filename: String): Unit = {
     val bd = new BuoyData(filename)
     val bdDF = bd.getDF(sc, spark.sqlContext)
-    val extractCurrentParams = bdDF.select("parameter").first.get(0).asInstanceOf[Seq[Seq[String]]].flatten
+    val extractCurrentParams = bdDF
+      .select("parameter")
+      .first
+      .get(0)
+      .asInstanceOf[Seq[Seq[String]]]
+      .flatten
     val selectColumns = extractCurrentParams ++ Seq("floatSerialNo", "longitude", "latitude", "platformNumber", "projectName", "juld",
-      "platformType", "configMissionNumber", "cycleNumber")
+      "platformType", "configMissionNumber", "cycleNumber", "dateUpdate")
     bdDF.select(selectColumns.head, selectColumns.tail: _*).write.
       format("com.mongodb.spark.sql.DefaultSource").mode("append").
       save()

@@ -4,7 +4,7 @@ import org.apache.spark.{SparkContext, SparkFiles}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.{Row, SQLContext}
 
-case class GlobalList(sc: SparkContext,
+class GlobalList(sc: SparkContext,
                       sqlContext: SQLContext,
                       path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt",
                       //path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt",
