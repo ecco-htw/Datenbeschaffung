@@ -1,13 +1,19 @@
 package main
 
+import java.net.URI
+
 import org.apache.log4j.{Level, Logger}
 import akka.actor.{Actor, ActorSystem, Props}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Row, SparkSession}
 import preprocessing.{GlobalList, ThisWeekList}
-import netcdfhandling.BuoyData
+import netcdfhandling.{BuoyData, NetCDFConverter}
 import observer.FtpObserver
 import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.types.{DoubleType, FloatType, IntegerType, StructField}
+import ucar.nc2.NetcdfFile
+
+import collection.JavaConverters._
 
 /** Main object to run argo-data retrieval.
   *
@@ -42,11 +48,18 @@ object RunProcedure {
     .config(conf)
     .getOrCreate()
 
+  import NetCDFConverter.extractVariable
+
+  val netCDFConverter = NetCDFConverter(
+    (extractVariable[Double]("JULD"), StructField("juld", DoubleType)),
+    (extractVariable[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType))
+  )
+
   def main(args: Array[String]) {
 
     val buoyList = new GlobalList(sc, spark.sqlContext)
 
-//    val buoyList = GlobalList(sc, spark.sqlContext).contentRDD
+    //    val buoyList = GlobalList(sc, spark.sqlContext).contentRDD
 
     //saveAllFromThisWeekList
     //val actorSystem = ActorSystem("eccoActorSystem")
@@ -95,7 +108,15 @@ object RunProcedure {
 
     //weeklist.foreach(println)
     //weeklist.foreach(saveDataMongoDB)
-//    saveDataMongoDB(weeklist.head)
+    //    saveDataMongoDB(weeklist.head)
+  }
+
+  def analyzeVariables(netcdfFile: NetcdfFile, varnames: String*): Seq[(String, String)] = {
+    if (varnames.isEmpty) netcdfFile.getVariables.asScala.map(v => (v.getNameAndDimensions, v.getDataType.toString))
+    else varnames.map(name => {
+      val v = netcdfFile.findVariable(name)
+      (v.getNameAndDimensions, v.getDataType.toString)
+    })
   }
 
   /** Store argo-data in mongodb of one specific NetCDF file.
@@ -103,27 +124,21 @@ object RunProcedure {
     * @param filename NetCDF file path.
     */
   def saveDataMongoDB(filename: String): Unit = {
-    val bd = new BuoyData(filename)
-    val bdDF = bd.getDF(sc, spark.sqlContext)
-    /*
-    println("______________________________________________________")
-    try {
-      bd.getDF(sc, spark.sqlContext).foreach(row => {
-        println("schema: " + row.schema.toString())
-        println(row.mkString(", "))
-      })
-    } catch {
-      case e => println(s"${if (e.getMessage.length > 100) e.getMessage.substring(0, 100) else e}")
-    }
-     */
-    //bd.getDF2(sc, spark.sqlContext)
-    //bd.analyze()
-    //bdDF.foreach((r: Row) => println(r.mkString))
-    println("______________________________________________________")
-    bdDF.write.
-      format("com.mongodb.spark.sql.DefaultSource").mode("append").
-      save()
+    val netCDFObject = NetcdfFile.openInMemory(new URI(filename))
 
+    // uncomment the following line to see a list of available variables and their type
+    //println(analyzeVariables(netCDFObject).mkString("\n"))
+
+    println(netCDFObject.findDimension("N_PROF"))
+
+    val data = sc.parallelize(netCDFConverter.getData(netCDFObject))
+    val schema = netCDFConverter.getSchema
+    val dataFrame = spark.sqlContext.createDataFrame(data, schema)
+    println("dfRows:", dataFrame.count())
+    dataFrame.write
+      .format("com.mongodb.spark.sql.DefaultSource")
+      .mode("append")
+      .save()
   }
 
 }

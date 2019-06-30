@@ -1,47 +1,39 @@
 package netcdfhandling
 
 
-import netcdfhandling.NetCDFConverter.ConversionInfo
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.{Row, SQLContext}
 import org.apache.spark.sql.types.{FloatType, StructField, StructType}
 import ucar.nc2._
 
 
 object NetCDFConverter {
-  def convertTo[T](ndJavaArray: AnyRef): List[T] = ndJavaArray.asInstanceOf[Array[T]].toList
-
-  implicit class ConversionInfo(info: (NetcdfFile => List[_], StructField)) {
-  }
-
   /**
     *
-    * @param conversionInfos Tuple3(name: String, convFn: ndJavaArray => List[_], fieldSchema: StructField)
-    *                        name = the name of the variable inside the NetCDF file
-    *                        convFn = function that converts a ndJavaArray to a scala List
+    * @param conversionInfos Seq of Tuple2(convFn: ndJavaArray => Seq[_], fieldSchema: StructField)
+    *                        convFn = function that extracts a specific Column of a NetCdf File and converts it to a scala List
     *                        fieldSchema = StructField defining the name and type of the field
     */
-  def apply(conversionInfos: (String, AnyRef => List[_], StructField)*): NetCDFConverter = {
-    val info = conversionInfos.unzip(tuple => ((tuple._1, tuple._2), tuple._3))
+  def apply(conversionInfos: (NetcdfFile => Seq[_], StructField)*): NetCDFConverter = {
+    val info = conversionInfos.unzip
     new NetCDFConverter(info._1, info._2)
   }
-}
 
-class NetCDFConverter(conversionInfo: Seq[(String, AnyRef => List[_])], schemaInfo: Seq[StructField]) {
-  def getSchema: StructType = StructType(schemaInfo)
-  def convertData(netcdfFile: NetcdfFile): List[Any] = {
-    def extractVariable[T](name: String, convFn: AnyRef => List[T]) = {
-      val ndJavaArray = netcdfFile.findVariable(name).read().copyToNDJavaArray()
-      convFn[T](ndJavaArray)
-    }
+  def defaultfn[T]: AnyRef => Seq[T] = (any: AnyRef) => any.asInstanceOf[Array[T]].toSeq
 
-    val a = conversionInfo.map(info => extractVariable(info._1, info._2))
-
+  def extractVariable[T](name: String, convFn: AnyRef => Seq[T] = defaultfn[T])(netcdfFile: NetcdfFile): Seq[T] = {
+    val ndJavaArray = netcdfFile.findVariable(name).read().copyToNDJavaArray()
+    convFn(ndJavaArray)
   }
-
 }
 
-class test() {
-  import netcdfhandling.NetCDFConverter.convertTo
-  def d() = NetCDFConverter(
-    ("JULD", convertTo[Float], StructField("juld", FloatType))
-  )
+class NetCDFConverter(conversionFuncs: Seq[NetcdfFile => Seq[_]], schemaInfo: Seq[StructField]) {
+
+  def getSchema: StructType = StructType(schemaInfo)
+
+  def getData(netcdfFile: NetcdfFile): Seq[Row] = {
+    // if you get an IllegalArgumentException on the following line it's probably because not
+    // all conversion functions you provided created a List with the same size
+    conversionFuncs.map(fn => fn(netcdfFile)).transpose.map(row => Row.fromSeq(row))
+  }
 }
