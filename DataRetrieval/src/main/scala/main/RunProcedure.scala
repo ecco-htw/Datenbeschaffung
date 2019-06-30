@@ -22,8 +22,10 @@ object RunProcedure {
   val hadoopUser = "ecco"
   // val hadoopPassword = sys.env("HTW_MONGO_PWD")
   val hadoopDB = "ecco.buoy"
-  val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
-  val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "hadoop05.f4.htw-berlin.de")
+  //val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
+  //val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "hadoop05.f4.htw-berlin.de")
+  val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27017")
+  val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "localhost")
 
   // Basic Spark configuration. Use 'buoy' as mongodb collection.
   val conf = new SparkConf()
@@ -103,17 +105,25 @@ object RunProcedure {
   def saveDataMongoDB(filename: String): Unit = {
     val bd = new BuoyData(filename)
     val bdDF = bd.getDF(sc, spark.sqlContext)
-    val extractCurrentParams = bdDF
-      .select("parameter")
-      .first
-      .get(0)
-      .asInstanceOf[Seq[Seq[String]]]
-      .flatten
-    val selectColumns = extractCurrentParams ++ Seq("floatSerialNo", "longitude", "latitude", "platformNumber", "projectName", "juld",
-      "platformType", "configMissionNumber", "cycleNumber", "dateUpdate")
-    bdDF.select(selectColumns.head, selectColumns.tail: _*).write.
+    /*
+    println("______________________________________________________")
+    try {
+      bd.getDF(sc, spark.sqlContext).foreach(row => {
+        println("schema: " + row.schema.toString())
+        println(row.mkString(", "))
+      })
+    } catch {
+      case e => println(s"${if (e.getMessage.length > 100) e.getMessage.substring(0, 100) else e}")
+    }
+     */
+    //bd.getDF2(sc, spark.sqlContext)
+    //bd.analyze()
+    //bdDF.foreach((r: Row) => println(r.mkString))
+    println("______________________________________________________")
+    bdDF.write.
       format("com.mongodb.spark.sql.DefaultSource").mode("append").
       save()
+
   }
 
 }
