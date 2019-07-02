@@ -10,7 +10,7 @@ import preprocessing.{GlobalList, ThisWeekList}
 import netcdfhandling.{BuoyData, NetCDFConverter}
 import observer.FtpObserver
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{DoubleType, FloatType, IntegerType, StructField}
+import org.apache.spark.sql.types.{DoubleType, FloatType, IntegerType, StringType, StructField}
 import ucar.nc2.NetcdfFile
 
 import collection.JavaConverters._
@@ -52,7 +52,8 @@ object RunProcedure {
 
   val netCDFConverter = NetCDFConverter(
     (extractVariable[Double]("JULD"), StructField("juld", DoubleType)),
-    (extractVariable[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType))
+    (extractVariable[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),
+    (extractVariable[Array[Char]]("FLOAT_SERIAL_NO", _.map(_.mkString.trim)), StructField("floatSerialNo", StringType))
   )
 
   def main(args: Array[String]) {
@@ -79,7 +80,7 @@ object RunProcedure {
     //spark.stop()
     */
     println(buoyList.nLines)
-    saveAll(0, buoyList, buoyList.rootFTP)
+    saveAll(100, buoyList, buoyList.rootFTP)
   }
 
   def saveAll(count: Int, global_list: GlobalList, rootFTP: String): Unit = {

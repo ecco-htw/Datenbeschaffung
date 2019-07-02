@@ -21,8 +21,8 @@ object NetCDFConverter {
 
   def defaultfn[T]: AnyRef => Seq[T] = (any: AnyRef) => any.asInstanceOf[Array[T]].toSeq
 
-  def extractVariable[T](name: String, convFn: AnyRef => Seq[T] = defaultfn[T])(netcdfFile: NetcdfFile): Seq[T] = {
-    val ndJavaArray = netcdfFile.findVariable(name).read().copyToNDJavaArray()
+  def extractVariable[T](name: String, convFn: Seq[T] => Seq[Any] = (a: Seq[T]) => identity(a))(netcdfFile: NetcdfFile): Seq[Any] = {
+    val ndJavaArray = netcdfFile.findVariable(name).read().copyToNDJavaArray().asInstanceOf[Array[T]].toSeq
     convFn(ndJavaArray)
   }
 }
