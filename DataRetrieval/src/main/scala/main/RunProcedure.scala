@@ -71,9 +71,11 @@ object RunProcedure {
     val extractCurrentParams = bdDF.select("parameter").first.get(0).asInstanceOf[Seq[Seq[String]]].flatten
     val selectColumns = extractCurrentParams ++ Seq("floatSerialNo", "longitude", "latitude", "platformNumber", "projectName", "juld",
       "platformType", "configMissionNumber", "cycleNumber")
+   /*
     bdDF.select(selectColumns.head, selectColumns.tail: _*).write.
       format("com.mongodb.spark.sql.DefaultSource").mode("append").
       save()
+      */
   }
 
 }
