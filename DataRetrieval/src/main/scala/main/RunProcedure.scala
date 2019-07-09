@@ -38,10 +38,10 @@ object RunProcedure {
     .getOrCreate()
 
   def main(args: Array[String]) {
-    //saveAllFromThisWeekList
-    val actorSystem = ActorSystem("eccoActorSystem")
+    saveAllFromThisWeekList
+    //val actorSystem = ActorSystem("eccoActorSystem")
     
-    val ftpObserver = actorSystem.actorOf(FtpObserver.props(saveAllFromThisWeekList), "ftpObserver")
+    //val ftpObserver = actorSystem.actorOf(FtpObserver.props(saveAllFromThisWeekList), "ftpObserver")
     //sc.stop()
     //spark.stop()
   }
@@ -55,6 +55,7 @@ object RunProcedure {
   def saveAllFromThisWeekList(): Unit = {
     val buoy_list = new ThisWeekList(sc, spark.sqlContext)
     val rootFTP = buoy_list.getRootFTP
+    println("check 1 reached")
     val weeklist= buoy_list.toRDD.map(row => rootFTP + "/" + row.getString(0)).collect().toList
     weeklist.foreach(saveDataMongoDB)
   }
@@ -64,6 +65,7 @@ object RunProcedure {
     * @param filename NetCDF file path.
     */
   def saveDataMongoDB(filename: String): Unit = {
+    println("check 2 reached")
     val bd = new BuoyData(filename)
     val bdDF = bd.getDF(sc, spark.sqlContext)
     val extractCurrentParams = bdDF.select("parameter").first.get(0).asInstanceOf[Seq[Seq[String]]].flatten
