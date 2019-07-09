@@ -38,8 +38,8 @@ import org.apache.spark.sql.{DataFrame, Row, SQLContext}
   */
 class ThisWeekList(sc: SparkContext,
                    sqlContext: SQLContext,
-                   //path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt",
-                   path: String="ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt",
+                   path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt",
+                   //path: String="ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt",
                    username: String = "anonymous",
                    password: String = "empty") {
 
