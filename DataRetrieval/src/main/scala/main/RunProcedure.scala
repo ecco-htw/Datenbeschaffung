@@ -10,7 +10,7 @@ import preprocessing.{GlobalList, ThisWeekList}
 import netcdfhandling.{BuoyData, NetCDFConverter}
 import observer.FtpObserver
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{DoubleType, FloatType, IntegerType, StringType, StructField}
+import org.apache.spark.sql.types.{ArrayType, DoubleType, FloatType, IntegerType, StringType, StructField}
 import ucar.nc2.NetcdfFile
 
 import collection.JavaConverters._
@@ -27,10 +27,10 @@ object RunProcedure {
   val hadoopPassword = "kd23.S.W"
   val hadoopUser = "ecco"
   // val hadoopPassword = sys.env("HTW_MONGO_PWD")
-  val hadoopDB = "ecco.buoy"
-  //val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
+  val hadoopDB = "ecco.buoyTest"
+  val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
   //val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "hadoop05.f4.htw-berlin.de")
-  val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27017")
+  //val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27017")
   val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "localhost")
 
   // Basic Spark configuration. Use 'buoy' as mongodb collection.
@@ -48,15 +48,23 @@ object RunProcedure {
     .config(conf)
     .getOrCreate()
 
-  import NetCDFConverter.extractVariable
 
+  import NetCDFConverter.{extractVariable, extractFirstProfile, extractFirstProfile2}
+
+  // TODO: probably better to move this to NetCDFConverter instead of passing through the constructor (separation of concerns)
   val netCDFConverter = NetCDFConverter(
-    (extractVariable[Double]("JULD"), StructField("juld", DoubleType)),
-    (extractVariable[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),
-    (extractVariable[Array[Char]]("FLOAT_SERIAL_NO", _.map(_.mkString.trim)), StructField("floatSerialNo", StringType))
+    (extractFirstProfile[Double]("JULD"), StructField("juld", DoubleType)),
+    (extractFirstProfile[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),
+    (extractFirstProfile[Array[Char]]("FLOAT_SERIAL_NO", _.mkString.trim), StructField("floatSerialNo", StringType)),
+    (extractFirstProfile[Array[Float]]("PRES", _.map(_.toDouble)), StructField("PRES", ArrayType(DoubleType))),
+    (extractFirstProfile[Array[Float]]("TEMP", _.map(_.toDouble)), StructField("TEMP", ArrayType(DoubleType))),
+    (extractFirstProfile[Array[Float]]("PSAL", _.map(_.toDouble)), StructField("PSAL", ArrayType(DoubleType))),
+    (extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),
+    (extractFirstProfile[Double]("LATITUDE"), StructField("latitude", DoubleType))
   )
 
   def main(args: Array[String]) {
+    val start_time = System.currentTimeMillis()
 
     val buoyList = new GlobalList(sc, spark.sqlContext)
 
@@ -80,18 +88,30 @@ object RunProcedure {
     //spark.stop()
     */
     println(buoyList.nLines)
-    saveAll(100, buoyList, buoyList.rootFTP)
+    saveAll(0, buoyList.contentRDD.count.asInstanceOf[Int], buoyList, buoyList.rootFTP)
+    val end_time = System.currentTimeMillis()
+    println("time: " + (end_time-start_time))
+    // 68709
   }
 
-  def saveAll(count: Int, global_list: GlobalList, rootFTP: String): Unit = {
+  def saveAll(start: Int, count: Int, global_list: GlobalList, rootFTP: String): Unit = {
     // if (count < global_list.lines) {
 
-    println(count)
-    //val rdd = global_list.toRDD((count, count + 500))
-    val rdd = global_list.getSubRDD((count, count + 15))
-    val fhl = rdd.map(row => rootFTP + "/" + row.getString(0)).collect().toList
-    fhl.foreach(saveDataMongoDB)
-    //saveAll(count + 500, global_list, rootFTP)
+    println(start)
+    //val rdd = global_list.toRDD((start, start + count))
+    val rdd = global_list.getSubRDD((start, start + count))
+    //val fhl = rdd.map(row => rootFTP + "/" + row.getString(0)).collect().toList
+    val fhl = rdd.map(row => rootFTP + "/" + row.getString(0))
+    //fhl.foreach(saveDataMongoDB)
+    val rows: RDD[Row] = fhl.map(filename => netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(filename))))
+
+    val dataFrame = spark.sqlContext.createDataFrame(rows, netCDFConverter.getSchema)
+    dataFrame.write
+      .format("com.mongodb.spark.sql.DefaultSource")
+      .mode("append")
+      .save()
+
+    //saveAll(start + count, count, global_list, rootFTP)
 
   }
 
@@ -130,12 +150,11 @@ object RunProcedure {
     // uncomment the following line to see a list of available variables and their type
     //println(analyzeVariables(netCDFObject).mkString("\n"))
 
-    println(netCDFObject.findDimension("N_PROF"))
+    //println(netCDFObject.findDimension("N_PROF"))
 
-    val data = sc.parallelize(netCDFConverter.getData(netCDFObject))
+    val data = sc.parallelize(Seq(netCDFConverter.extractData(netCDFObject)))
     val schema = netCDFConverter.getSchema
     val dataFrame = spark.sqlContext.createDataFrame(data, schema)
-    println("dfRows:", dataFrame.count())
     dataFrame.write
       .format("com.mongodb.spark.sql.DefaultSource")
       .mode("append")
