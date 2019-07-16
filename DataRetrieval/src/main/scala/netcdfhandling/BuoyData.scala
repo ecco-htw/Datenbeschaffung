@@ -98,21 +98,14 @@ class BuoyData(netcdf_path: String = "src/main/resources/20180606_prof.nc") {
   //  }
 
   private[this] def extractData = {
-    def convertTo[T](ndJavaArray: AnyRef): List[T] = ndJavaArray.asInstanceOf[Array[T]].toList
+    def convertTo[T]: AnyRef => List[T] = (ndJavaArray: AnyRef) => ndJavaArray.asInstanceOf[Array[T]].toList
 
-    def extractVariable[T](name: String, convFn: AnyRef => List[T] = convertTo)(netcdfFile: NetcdfFile) = {
+    def extractVariable[T](name: String, convFn: AnyRef => List[T] = convertTo[T])(netcdfFile: NetcdfFile) = {
       val ndJavaArray = getJavaNetCDFObject.findVariable(name).read().copyToNDJavaArray()
-      convFn[T](ndJavaArray)
+      convFn(ndJavaArray)
     }
     val variable = getJavaNetCDFObject.findVariable("JULD")
     val a = variable.read().copyToNDJavaArray().asInstanceOf[Array[Float]]
-
-
-    Seq(
-      extractVariable[Float]("JULD"),
-      extractVariable[Array[Float]]("PRES"),
-      extractVariable[String]("FLOAT_SERIAL_NO")
-    )
   }
 
   /** Returns argo-variables as Scala List of Lists, used to create Spark RDD / Spark DataFrame.

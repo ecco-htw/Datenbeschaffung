@@ -27,10 +27,10 @@ object RunProcedure {
   val hadoopPassword = "kd23.S.W"
   val hadoopUser = "ecco"
   // val hadoopPassword = sys.env("HTW_MONGO_PWD")
-  val hadoopDB = "ecco.buoyTest"
-  val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
+  val hadoopDB = "ecco"
+  //val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
   //val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "hadoop05.f4.htw-berlin.de")
-  //val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27017")
+  val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27017")
   val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "localhost")
 
   // Basic Spark configuration. Use 'buoy' as mongodb collection.
@@ -39,7 +39,7 @@ object RunProcedure {
     .setAppName("HTW-Argo")
     //.set("spark.executor.memory", "471m")
     .set("spark.ui.port", "4050")
-    .set("spark.mongodb.output.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.buoyTestAll3")
+    .set("spark.mongodb.output.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.buoy")
     .set("spark.mongodb.input.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.buoy?readPreference=primaryPreferred")
   val sc = new SparkContext(conf)
   val spark = SparkSession
@@ -88,7 +88,7 @@ object RunProcedure {
     //spark.stop()
     */
     println(buoyList.nLines)
-    saveAll(0, buoyList.contentRDD.count.asInstanceOf[Int], buoyList, buoyList.rootFTP)
+    saveAll(0, buoyList.nLines.toInt, buoyList, buoyList.rootFTP)
     val end_time = System.currentTimeMillis()
     println("time: " + (end_time-start_time))
     // 68709
