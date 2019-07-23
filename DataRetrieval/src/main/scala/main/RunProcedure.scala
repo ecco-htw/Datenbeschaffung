@@ -88,7 +88,7 @@ object RunProcedure {
     //spark.stop()
     */
     println(buoyList.nLines)
-    saveAll(0, buoyList.nLines.toInt, buoyList, buoyList.rootFTP)
+    saveAll(0, 2000, buoyList, buoyList.rootFTP)
     val end_time = System.currentTimeMillis()
     println("time: " + (end_time-start_time))
     // 68709
@@ -99,17 +99,22 @@ object RunProcedure {
 
     println(start)
     //val rdd = global_list.toRDD((start, start + count))
-    val rdd = global_list.getSubRDD((start, start + count))
+    val rdd = sc.parallelize(global_list.getSubRDD((start, start + count)).collect())
     //val fhl = rdd.map(row => rootFTP + "/" + row.getString(0)).collect().toList
-    val fhl = rdd.map(row => rootFTP + "/" + row.getString(0))
+    //val fhl = rdd.map(row => rootFTP + "/" + row.getString(0))
     //fhl.foreach(saveDataMongoDB)
-    val rows: RDD[Row] = fhl.map(filename => netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(filename))))
+
+    val rows: RDD[Row] = rdd.map(row => netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(rootFTP + "/" + row._1))))
+    rows.collect()
+    /*
 
     val dataFrame = spark.sqlContext.createDataFrame(rows, netCDFConverter.getSchema)
     dataFrame.write
       .format("com.mongodb.spark.sql.DefaultSource")
       .mode("append")
       .save()
+
+     */
 
     //saveAll(start + count, count, global_list, rootFTP)
 

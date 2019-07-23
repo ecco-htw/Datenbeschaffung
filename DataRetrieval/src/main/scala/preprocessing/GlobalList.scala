@@ -8,41 +8,44 @@ class GlobalList(sc: SparkContext,
                       sqlContext: SQLContext,
                       path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt",
                       //path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt",
+                      //path: String = "file://src/main/resources/index_short.txt",
                       username: String = "anonymous",
                       password: String = "empty") extends Serializable {
   private[this] def fullpath: String = s"ftp://$username:$password@$path"
 
   sc.addFile(fullpath)
   val fileName: String = SparkFiles.get(fullpath.split("/").last)
-  val fullRDD: RDD[String] = sc.textFile(fileName, 4)
+  val fullRDD: RDD[String] = sc.textFile(fileName, 30)
   val nTopRows: Int =
     fullRDD
-      .zipWithIndex()
-      .filter { case (str, index) ⇒ !str.startsWith("#") }
-      .first()._2.toInt + 1 // x rows starting with #, and one header row
+      .filter { str ⇒ str.startsWith("#") }.count().toInt + 1 // x rows starting with #, and one header row
+
   val rootFTP: String =
     fullRDD
       .take(nTopRows)
       .view
       .filter(str ⇒ str.startsWith("#") && str.contains("FTP root number 1"))
       .head.split(": ")(1).trim
-  val contentRDD: RDD[Array[String]] =
-    fullRDD
-      .zipWithIndex()
-      .filter(_._2 > nTopRows)
-      .keys
-      .map(str => str.split(","))
-      .sortBy(_.last)
+
+  val contentRDD: RDD[(String, String)] = {
+    fullRDD.zipWithIndex().flatMap{
+      case (_, i) if i < nTopRows => None
+      case (s, i) =>
+        val splt = s.split(",")
+        Some((splt.head, splt.last))
+    }.sortBy(_._2)
+  }
+
   val nLines: Long = contentRDD.count()
 
-  def getSubRDD(range: (Long, Long)): RDD[Row] = {
+  def getSubRDD(range: (Long, Long)): RDD[(String, String)] = {
     val lowerBound = range._1
     val upperBound = if (range._2 <= nLines) range._2 else nLines
     contentRDD
       .zipWithIndex()
       .filter { case (arr, index) ⇒ index >= lowerBound && index < upperBound }
-      .map { case (arr, index) ⇒ Row.fromSeq(arr) }
-    // TODO ? parallelize?
+      .map { case (arr, index) ⇒ arr }
+    // TODO ? parallelize? AW(pat): No it's already an RDD
   }
 
   //  def toRDD(range: (Long, Long)): RDD[Row] = {
