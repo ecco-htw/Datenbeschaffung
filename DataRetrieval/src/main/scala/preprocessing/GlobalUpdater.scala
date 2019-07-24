@@ -2,7 +2,7 @@ package preprocessing
 
 import db.MongoDBManager
 import netcdfhandling.NetCDFConverter
-import preprocessing.IndexFile.{Date, IndexFileEntry}
+import preprocessing.IndexFile.Date
 import ucar.nc2.NetcdfFile
 
 class GlobalUpdater(val netCDFConverter: NetCDFConverter, val mongoDBManager: MongoDBManager) {
