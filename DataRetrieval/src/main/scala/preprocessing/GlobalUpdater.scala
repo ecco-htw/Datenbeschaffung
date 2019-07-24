@@ -2,7 +2,6 @@ package preprocessing
 
 import db.MongoDBManager
 import netcdfhandling.NetCDFConverter
-import org.apache.spark.rdd.RDD
 import preprocessing.IndexFile.{Date, IndexFileEntry}
 import ucar.nc2.NetcdfFile
 
