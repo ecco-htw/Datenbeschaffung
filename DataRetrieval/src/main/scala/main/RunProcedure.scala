@@ -3,12 +3,10 @@ package main
 import java.net.URI
 
 import org.apache.log4j.{Level, Logger}
-import akka.actor.{Actor, ActorSystem, Props}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Row, SparkSession}
 import preprocessing.{GlobalList, ThisWeekList}
-import netcdfhandling.{BuoyData, NetCDFConverter}
-import observer.FtpObserver
+import netcdfhandling.NetCDFConverter
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{ArrayType, DoubleType, FloatType, IntegerType, StringType, StructField}
 import ucar.nc2.NetcdfFile
@@ -23,6 +21,8 @@ object RunProcedure {
 
   // Omit INFO log in console
   val rootLogger = Logger.getLogger("org").setLevel(Level.WARN)
+
+  // TODO: cleanup this mess and use MongoDBManager instead
   // Use environment variables for authentication
   val hadoopPassword = "kd23.S.W"
   val hadoopUser = "ecco"

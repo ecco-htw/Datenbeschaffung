@@ -4,6 +4,7 @@ import org.apache.spark.rdd.RDD
 import preprocessing.IndexFile.IndexFileEntry
 
 class IndexFile(val filepath: String) {
+  val rootFTP: String = ???
   val data: RDD[IndexFileEntry] = ???
 }
 
