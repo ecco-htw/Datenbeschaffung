@@ -6,7 +6,7 @@ import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Row, SparkSession}
 import preprocessing.{GlobalList, ThisWeekList}
-import netcdfhandling.NetCDFConverter
+import netcdfhandling.buoyNetCDFConverter
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{ArrayType, DoubleType, FloatType, IntegerType, StringType, StructField}
 import ucar.nc2.NetcdfFile
@@ -49,20 +49,6 @@ object RunProcedure {
     .getOrCreate()
 
 
-  import NetCDFConverter.{extractVariable, extractFirstProfile, extractFirstProfile2}
-
-  // TODO: probably better to move this to NetCDFConverter instead of passing through the constructor (separation of concerns)
-  val netCDFConverter = NetCDFConverter(
-    (extractFirstProfile[Double]("JULD"), StructField("juld", DoubleType)),
-    (extractFirstProfile[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),
-    (extractFirstProfile[Array[Char]]("FLOAT_SERIAL_NO", _.mkString.trim), StructField("floatSerialNo", StringType)),
-    (extractFirstProfile[Array[Float]]("PRES", _.map(_.toDouble)), StructField("PRES", ArrayType(DoubleType))),
-    (extractFirstProfile[Array[Float]]("TEMP", _.map(_.toDouble)), StructField("TEMP", ArrayType(DoubleType))),
-    (extractFirstProfile[Array[Float]]("PSAL", _.map(_.toDouble)), StructField("PSAL", ArrayType(DoubleType))),
-    (extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),
-    (extractFirstProfile[Double]("LATITUDE"), StructField("latitude", DoubleType))
-  )
-
   def main(args: Array[String]) {
     val start_time = System.currentTimeMillis()
 
@@ -104,7 +90,7 @@ object RunProcedure {
     //val fhl = rdd.map(row => rootFTP + "/" + row.getString(0))
     //fhl.foreach(saveDataMongoDB)
 
-    val rows: RDD[Row] = rdd.map(row => netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(rootFTP + "/" + row._1))))
+    val rows: RDD[Row] = rdd.map(row => buoyNetCDFConverter.extractData(NetcdfFile.openInMemory(new URI(rootFTP + "/" + row._1))))
     rows.collect()
     /*
 
@@ -157,8 +143,8 @@ object RunProcedure {
 
     //println(netCDFObject.findDimension("N_PROF"))
 
-    val data = sc.parallelize(Seq(netCDFConverter.extractData(netCDFObject)))
-    val schema = netCDFConverter.getSchema
+    val data = sc.parallelize(Seq(buoyNetCDFConverter.extractData(netCDFObject)))
+    val schema = buoyNetCDFConverter.getSchema
     val dataFrame = spark.sqlContext.createDataFrame(data, schema)
     dataFrame.write
       .format("com.mongodb.spark.sql.DefaultSource")

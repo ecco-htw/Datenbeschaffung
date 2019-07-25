@@ -19,21 +19,9 @@ object NetCDFConverter {
     new NetCDFConverter(conversionFuncs, schemaInfo)
   }
 
-  def defaultfn[T]: AnyRef => Seq[T] = (any: AnyRef) => any.asInstanceOf[Array[T]].toSeq
-
-  def firstProfile[T <: Seq[Any]](seq: T): Any = seq.head
-
   def extractFirstProfile[T](name: String, convFn: T => Any = (a: T) => identity(a))(netcdfFile: NetcdfFile): Any = {
     val ndJavaArray = netcdfFile.findVariable(name).read().copyToNDJavaArray().asInstanceOf[Array[T]].head
     convFn(ndJavaArray)
-  }
-
-  def extractFirstProfile2[T](name: String, convFn: T => Any = (a: T) => identity(a))(netcdfFile: NetcdfFile): Any = {
-    val v = netcdfFile.findVariable(name)
-    val ndJavaArray = v.read().copyToNDJavaArray().asInstanceOf[Array[T]].head
-    val r = convFn(ndJavaArray)
-    println(s"ndims($r): " + v.getDimensions.size())
-    r
   }
 
   def extractVariable[T](name: String, convFn: T => Any = (a: T) => identity(a))(netcdfFile: NetcdfFile): Any = {
