@@ -8,8 +8,8 @@ import preprocessing.IndexFile.Date
 @RunWith(classOf[JUnitRunner])
 class DateTest extends FunSuite {
   val smallestDate = Date("20181011200014")
-  val mediumDate = Date("20181011202014")
-  val biggestDate = Date("20191011202014")
+  val mediumDate = Date("20181011200015")
+  val biggestDate = Date("20181011200016")
 
   test("== should return True") {
     assert(smallestDate === smallestDate)

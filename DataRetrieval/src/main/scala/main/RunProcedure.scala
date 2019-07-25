@@ -52,7 +52,7 @@ object RunProcedure {
   def main(args: Array[String]) {
     val index=new IndexFile(sc,spark.sqlContext)
     val rdd=index.data
-    rdd.take(100).foreach(x=>println(x.date.year))
+    rdd.collect.foreach(x=>println(x.date.hour))
    // val start_time = System.currentTimeMillis()
 
     //val buoyList = new GlobalList(sc, spark.sqlContext)

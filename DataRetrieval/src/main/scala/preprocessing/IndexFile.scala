@@ -8,6 +8,7 @@ import preprocessing.IndexFile.IndexFileEntry
 class IndexFile(sc: SparkContext,
                 sqlContext: SQLContext,
                 path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt",
+                //path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt",
                 username: String = "anonymous",
                 password: String = "empty") extends Serializable {
   private[this] def fullpath: String = s"ftp://$username:$password@$path"
@@ -30,9 +31,10 @@ object IndexFile {
     val month: Int = date.substring(4, 6).toInt
     val day: Int = date.substring(6, 8).toInt
     val hour: Int = date.substring(8, 10).toInt
-    val second: Int = date.substring(10, 12).toInt
+    val minute: Int = date.substring(10, 12).toInt
+    val second: Int = date.substring(12, 14).toInt
 
-    val units: List[Int] = List(year, month, day, hour, second)
+    val units: List[Int] = List(year, month, day, hour, minute,second)
 
 
     def >(other: Date): Boolean = {
