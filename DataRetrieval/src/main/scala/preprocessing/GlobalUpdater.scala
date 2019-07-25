@@ -2,11 +2,14 @@ package preprocessing
 
 import db.MongoDBManager
 import netcdfhandling.NetCDFConverter
+import org.apache.spark.SparkContext
+import org.apache.spark.sql.SQLContext
 import preprocessing.IndexFile.Date
 import ucar.nc2.NetcdfFile
 
-class GlobalUpdater(val netCDFConverter: NetCDFConverter, val mongoDBManager: MongoDBManager) {
-  val indexFile = new IndexFile("ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
+class GlobalUpdater(val netCDFConverter: NetCDFConverter, val mongoDBManager: MongoDBManager, val sqlContext: SQLContext,
+                    val sparkContext: SparkContext) {
+  val indexFile = new IndexFile(sparkContext, sqlContext, path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
 
   // TODO: maybe find better name
   def retrieveCurrentProgress(): Date = ??? // should retrieve saved progress date

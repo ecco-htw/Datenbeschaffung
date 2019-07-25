@@ -5,7 +5,7 @@ import java.net.URI
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Row, SparkSession}
-import preprocessing.{GlobalList, ThisWeekList}
+import preprocessing.{GlobalList, IndexFile, ThisWeekList}
 import netcdfhandling.buoyNetCDFConverter
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{ArrayType, DoubleType, FloatType, IntegerType, StringType, StructField}
@@ -50,9 +50,12 @@ object RunProcedure {
 
 
   def main(args: Array[String]) {
-    val start_time = System.currentTimeMillis()
+    val index=new IndexFile(sc,spark.sqlContext)
+    val rdd=index.data
+    rdd.take(100).foreach(x=>println(x.date.year))
+   // val start_time = System.currentTimeMillis()
 
-    val buoyList = new GlobalList(sc, spark.sqlContext)
+    //val buoyList = new GlobalList(sc, spark.sqlContext)
 
     //    val buoyList = GlobalList(sc, spark.sqlContext).contentRDD
 
@@ -72,12 +75,13 @@ object RunProcedure {
     saveDataMongoDB(nh.head)
     //sc.stop()
     //spark.stop()
-    */
+
     println(buoyList.nLines)
     saveAll(0, 2000, buoyList, buoyList.rootFTP)
     val end_time = System.currentTimeMillis()
     println("time: " + (end_time-start_time))
     // 68709
+    */
   }
 
   def saveAll(start: Int, count: Int, global_list: GlobalList, rootFTP: String): Unit = {
