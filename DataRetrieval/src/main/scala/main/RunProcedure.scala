@@ -20,37 +20,10 @@ import collection.JavaConverters._
 object RunProcedure {
 
   // Omit INFO log in console
-  val rootLogger = Logger.getLogger("org").setLevel(Level.WARN)
-
-  // TODO: cleanup this mess and use MongoDBManager instead
-  // Use environment variables for authentication
-  val hadoopPassword = "kd23.S.W"
-  val hadoopUser = "ecco"
-  // val hadoopPassword = sys.env("HTW_MONGO_PWD")
-  val hadoopDB = "ecco"
-  //val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
-  //val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "hadoop05.f4.htw-berlin.de")
-  val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27017")
-  val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "localhost")
-
-  // Basic Spark configuration. Use 'buoy' as mongodb collection.
-  val conf = new SparkConf()
-    .setMaster("local[8]")
-    .setAppName("HTW-Argo")
-    //.set("spark.executor.memory", "471m")
-    .set("spark.ui.port", "4050")
-    .set("spark.mongodb.output.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.buoy")
-    .set("spark.mongodb.input.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.buoy?readPreference=primaryPreferred")
-  val sc = new SparkContext(conf)
-  val spark = SparkSession
-    .builder()
-    .appName("Spark SQL for Argo Data")
-    .config(conf)
-    .getOrCreate()
-
+  Logger.getLogger("org").setLevel(Level.WARN)
 
   def main(args: Array[String]) {
-    val index=new IndexFile(sc,spark.sqlContext)
+    val index=new IndexFile()
     val rdd=index.data
     rdd.collect.foreach(x=>println(x.date.hour))
    // val start_time = System.currentTimeMillis()
@@ -89,7 +62,7 @@ object RunProcedure {
 
     println(start)
     //val rdd = global_list.toRDD((start, start + count))
-    val rdd = sc.parallelize(global_list.getSubRDD((start, start + count)).collect())
+    val rdd = EccoSpark.sparkContext.parallelize(global_list.getSubRDD((start, start + count)).collect())
     //val fhl = rdd.map(row => rootFTP + "/" + row.getString(0)).collect().toList
     //val fhl = rdd.map(row => rootFTP + "/" + row.getString(0))
     //fhl.foreach(saveDataMongoDB)
@@ -118,9 +91,11 @@ object RunProcedure {
     *
     */
   def saveAllFromThisWeekList(): Unit = {
+    /*
     val buoy_list = new ThisWeekList(sc, spark.sqlContext)
     val rootFTP = buoy_list.getRootFTP
     val weeklist = buoy_list.toRDD.map(row => rootFTP + "/" + row.getString(0)).collect().toList
+     */
 
     //weeklist.foreach(println)
     //weeklist.foreach(saveDataMongoDB)
@@ -147,6 +122,7 @@ object RunProcedure {
 
     //println(netCDFObject.findDimension("N_PROF"))
 
+    /*
     val data = sc.parallelize(Seq(buoyNetCDFConverter.extractData(netCDFObject)))
     val schema = buoyNetCDFConverter.getSchema
     val dataFrame = spark.sqlContext.createDataFrame(data, schema)
@@ -154,6 +130,7 @@ object RunProcedure {
       .format("com.mongodb.spark.sql.DefaultSource")
       .mode("append")
       .save()
+     */
   }
 
 }

@@ -1,21 +1,20 @@
 package preprocessing
 
+import main.EccoSpark
 import org.apache.spark.{SparkContext, SparkFiles}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
 import preprocessing.IndexFile.IndexFileEntry
 
-class IndexFile(sc: SparkContext,
-                sqlContext: SQLContext,
-                path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt",
+class IndexFile(path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt",
                 //path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt",
                 username: String = "anonymous",
                 password: String = "empty") extends Serializable {
   private[this] def fullpath: String = s"ftp://$username:$password@$path"
 
-  sc.addFile(fullpath)
+  EccoSpark.sparkContext.addFile(fullpath)
   val fileName: String = SparkFiles.get(fullpath.split("/").last)
-  val fullRDD: RDD[String] = sc.textFile(fileName, 30)
+  val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fileName, 30)
   val nTopRows: Int =
     fullRDD
       .filter { str ⇒ str.startsWith("#") }.count().toInt + 1
