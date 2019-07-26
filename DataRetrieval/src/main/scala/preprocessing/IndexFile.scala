@@ -4,7 +4,7 @@ import main.EccoSpark
 import org.apache.spark.{SparkContext, SparkFiles}
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.SQLContext
-import preprocessing.IndexFile.IndexFileEntry
+import preprocessing.IndexFile.{Date, IndexFileEntry}
 
 class IndexFile(path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt",
                 //path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt",
@@ -19,7 +19,11 @@ class IndexFile(path: String = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_p
     fullRDD
       .filter { str ⇒ str.startsWith("#") }.count().toInt + 1
   val rootFTP: String = fullRDD.take(nTopRows).filter(line => line.contains("# FTP root number 1")).head.split(": ")(1).trim
-  val data: RDD[IndexFileEntry] = fullRDD.zipWithIndex.filter(_._2 > nTopRows).map(lineAndIndex => IndexFileEntry(lineAndIndex._1))
+  val data: RDD[IndexFileEntry] = fullRDD.zipWithIndex.filter(_._2 > nTopRows)
+    .map(lineAndIndex => {
+      val args = lineAndIndex._1.split(",")
+      IndexFileEntry(args.head, Date(args.last))
+    })
 }
 
 object IndexFile {
@@ -92,11 +96,5 @@ object IndexFile {
   }
 
 
-  case class IndexFileEntry(line: String) {
-    val asArray: Array[String] = line.split(",")
-
-    val date: Date = Date(asArray.last)
-    val path: String = asArray.head
-  }
-
+  case class IndexFileEntry(path: String, date: Date)
 }
