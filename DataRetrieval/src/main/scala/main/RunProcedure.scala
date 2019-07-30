@@ -5,7 +5,7 @@ import java.net.URI
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.{Row, SparkSession}
-import preprocessing.{GlobalList, IndexFile, ThisWeekList}
+import preprocessing.{GlobalList, GlobalUpdater, IndexFile, ThisWeekList}
 import netcdfhandling.buoyNetCDFConverter
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{ArrayType, DoubleType, FloatType, IntegerType, StringType, StructField}
@@ -22,39 +22,22 @@ object RunProcedure {
   // Omit INFO log in console
   Logger.getLogger("org").setLevel(Level.WARN)
 
+  val globalUpdater: GlobalUpdater = new GlobalUpdater(buoyNetCDFConverter)
+
   def main(args: Array[String]) {
+    val start_time = System.currentTimeMillis()
+    /** TIMER START */
+    /*
     val index=new IndexFile()
     val rdd=index.data
     rdd.collect.foreach(x=>println(x.date.hour))
-   // val start_time = System.currentTimeMillis()
+     */
 
-    //val buoyList = new GlobalList(sc, spark.sqlContext)
+    globalUpdater.update()
 
-    //    val buoyList = GlobalList(sc, spark.sqlContext).contentRDD
-
-    //saveAllFromThisWeekList
-    //val actorSystem = ActorSystem("eccoActorSystem")
-
-    //val ftpObserver = actorSystem.actorOf(FtpObserver.props(saveAllFromThisWeekList), "ftpObserver")
-    //val text = GlobalReader(sc, spark.sqlContext).getTextRdd
-    //val buoy_list = GlobalList(sc, spark.sqlContext, text)
-    /*
-    val firsthundred = buoy_list.toRDD((0, 100))
-    val rootFTP = buoy_list.rootFTP
-    val fhl = firsthundred.map(row => rootFTP + "/" + row.getString(0)).collect().toList
-    saveDataMongoDB(fhl.head)
-    val nexthundred = buoy_list.toRDD((100, 200))
-    val nh = nexthundred.map(row => rootFTP + "/" + row.getString(0)).collect().toList
-    saveDataMongoDB(nh.head)
-    //sc.stop()
-    //spark.stop()
-
-    println(buoyList.nLines)
-    saveAll(0, 2000, buoyList, buoyList.rootFTP)
+    /** TIMER END */
     val end_time = System.currentTimeMillis()
     println("time: " + (end_time-start_time))
-    // 68709
-    */
   }
 
   def saveAll(start: Int, count: Int, global_list: GlobalList, rootFTP: String): Unit = {

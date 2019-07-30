@@ -15,7 +15,7 @@ object EccoSpark {
   private val hadoopUser = "ecco"
   // val hadoopPassword = sys.env("HTW_MONGO_PWD")
   private val hadoopDB = "ecco"
-  private val hadoopCollection = "buoy"
+  private val hadoopCollection = "buoyTest"
   //val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
   //val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "hadoop05.f4.htw-berlin.de")
   private val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27017")
@@ -47,5 +47,4 @@ object EccoSpark {
 
   def loadLastUpdateDate(): String = ???
     //MongoSpark.load(spark, new ReadConfig(hadoopDB, "buoyMeta"))
-
 }

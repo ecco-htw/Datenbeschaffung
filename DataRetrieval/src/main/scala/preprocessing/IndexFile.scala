@@ -95,6 +95,5 @@ object IndexFile {
 
   }
 
-
   case class IndexFileEntry(path: String, date: Date)
 }
