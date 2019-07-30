@@ -30,7 +30,7 @@ object NetCDFConverter {
   }
 }
 
-class NetCDFConverter(conversionFuncs: Seq[NetcdfFile => Any], schemaInfo: Seq[StructField]) {
+class NetCDFConverter(conversionFuncs: Seq[NetcdfFile => Any], schemaInfo: Seq[StructField]) extends Serializable {
 
   def getSchema: StructType = StructType(schemaInfo)
 

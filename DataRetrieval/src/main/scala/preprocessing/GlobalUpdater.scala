@@ -4,8 +4,9 @@ import main.EccoSpark
 import netcdfhandling.NetCDFConverter
 import preprocessing.IndexFile.Date
 import ucar.nc2.NetcdfFile
+import java.net.URI
 
-class GlobalUpdater(private val netCDFConverter: NetCDFConverter) {
+class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {
 
   private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
 
@@ -16,6 +17,7 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) {
   private def saveCurrentProgress(progress: Date): Unit = {} // DUMMY // should save new progress date
 
   def update(): Unit = {
+    println("updating")
     val minBucketSize = 1000
     val fullRdd = indexFile.data.sortBy(_.date.date).zipWithIndex()
 
@@ -28,7 +30,7 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) {
 
         //process and save bucketRDD
         val rows = bucketRdd.map {
-          case (entry, index) => netCDFConverter.extractData(NetcdfFile.openInMemory(indexFile.rootFTP + "/" + entry.path))
+          case (entry, index) => netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(indexFile.rootFTP + "/" + entry.path)))
         }
         EccoSpark.saveEccoData(rows, netCDFConverter.getSchema)
 
