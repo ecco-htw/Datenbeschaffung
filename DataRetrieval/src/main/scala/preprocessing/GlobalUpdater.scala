@@ -2,6 +2,8 @@ package preprocessing
 
 import main.EccoSpark
 import netcdfhandling.NetCDFConverter
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Row
 import preprocessing.IndexFile.Date
 import ucar.nc2.NetcdfFile
 import java.net.URI
@@ -11,7 +13,7 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
   private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
 
   // TODO: maybe find better name
-  private def retrieveCurrentProgress(): Date = Date("20190615090951") // DUMMY // should retrieve saved progress date
+  private def retrieveCurrentProgress(): Date = Date("20190729090951") // DUMMY // should retrieve saved progress date
 
   // TODO: maybe find better name
   private def saveCurrentProgress(progress: Date): Unit = {} // DUMMY // should save new progress date
@@ -22,15 +24,19 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
     val fullRdd = indexFile.data.sortBy(_.date.date).zipWithIndex()
 
     def processBucket(progress: Date): Unit = {
-      val remaining = fullRdd.filter { case (entry, index) => entry.date > progress }
+      val remaining = fullRdd.filter { case (entry, index) => entry.date.date > progress.date }
       if (remaining.count() > 0) {
         val maxIndex = remaining.first()._2 + minBucketSize
-        val maxDate = remaining.filter { case (entry, index) => index == maxIndex }.first()._1.date
-        val bucketRdd = remaining.filter { case (entry, index) => entry.date <= maxDate }
+        val maxDate = remaining.filter { case (entry, index) => index <= maxIndex }.sortBy(_._2, ascending = false).first()._1.date
+        val bucket = remaining.flatMap {
+          case (entry, index) if entry.date.date <= maxDate.date => Some(entry)
+          case _ => None
+        }.collect()
+        val bucketRdd = EccoSpark.sparkContext.parallelize(bucket)
 
         //process and save bucketRDD
-        val rows = bucketRdd.map {
-          case (entry, index) => netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(indexFile.rootFTP + "/" + entry.path)))
+        val rows: RDD[Row] = bucketRdd.map {
+          entry => netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(indexFile.rootFTP + "/" + entry.path)))
         }
         EccoSpark.saveEccoData(rows, netCDFConverter.getSchema)
 
