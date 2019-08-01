@@ -52,9 +52,8 @@ object EccoSpark {
   def saveDate(date: Date): Unit = {
 
     val schema = StructField("date", StringType)
-    val schemaType = StructType(List(schema))
     val rdd: RDD[Row] = sparkContext.parallelize(List(Row(date.date)))
-    val df = spark.sqlContext.createDataFrame(rdd, schemaType)
+    val df = spark.sqlContext.createDataFrame(rdd, StructType(List(schema)))
     val writeConfig = WriteConfig(Map("uri" -> dateURI))
     MongoSpark.save(df, writeConfig)
   }
