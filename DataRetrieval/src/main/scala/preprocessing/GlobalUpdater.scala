@@ -10,7 +10,8 @@ import java.net.URI
 
 class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {
 
-  private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
+  //private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
+  private val indexFile = new IndexFile(path = "/home/manuel/Downloads/ar_index_global_prof.txt")
 
   // TODO: maybe find better name
   private def retrieveCurrentProgress(): Date = Date("20190729090951") // DUMMY // should retrieve saved progress date
@@ -19,6 +20,8 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
   private def saveCurrentProgress(progress: Date): Unit = {} // DUMMY // should save new progress date
 
   def update(): Unit = {
+    //EccoSpark.saveDate(Date("20200729090951"))
+    //println(EccoSpark.loadLastUpdateDate())
     println("updating")
     val minBucketSize = 1000
     val fullRdd = indexFile.data.sortBy(_.date.date).zipWithIndex()
