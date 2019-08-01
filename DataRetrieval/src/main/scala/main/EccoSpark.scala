@@ -60,8 +60,8 @@ object EccoSpark {
 
   def loadLastUpdateDate(): Date = {
     val readConfig = ReadConfig(Map("uri" -> dateURI))
-    val x = MongoSpark.load(sparkContext, readConfig)
-    x.map(x => Date(x.getString("date"))).sortBy(_.date, ascending = false).first()
+    val dates = MongoSpark.load(sparkContext, readConfig)
+    dates.map(date => Date(date.getString("date"))).sortBy(_.date, ascending = false).first()
   }
 
   //MongoSpark.load(spark, new ReadConfig(hadoopDB, "buoyMeta"))
