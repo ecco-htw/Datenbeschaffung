@@ -14,13 +14,13 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
   private val indexFile = new IndexFile(path = "/home/manuel/Downloads/ar_index_global_prof.txt")
 
   // TODO: maybe find better name
-  private def retrieveCurrentProgress(): Date = Date("20190729090951") // DUMMY // should retrieve saved progress date
+  private def retrieveCurrentProgress(): Date = EccoSpark.loadLastUpdateDate() // DUMMY // should retrieve saved progress date
 
   // TODO: maybe find better name
-  private def saveCurrentProgress(progress: Date): Unit = {} // DUMMY // should save new progress date
+  private def saveCurrentProgress(progress: Date): Unit = EccoSpark.saveDate(progress) // DUMMY // should save new progress date
 
   def update(): Unit = {
-    //EccoSpark.saveDate(Date("20200729090951"))
+    //EccoSpark.saveDate(Date("24210729090951"))
     //println(EccoSpark.loadLastUpdateDate())
     println("updating")
     val minBucketSize = 1000

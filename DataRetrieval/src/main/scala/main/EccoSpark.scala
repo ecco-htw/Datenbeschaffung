@@ -2,8 +2,9 @@ package main
 
 import com.mongodb.spark.MongoSpark
 import com.mongodb.spark.config.{ReadConfig, WriteConfig}
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.IntType
 import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{StringType, StructField, StructType}
+import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 import preprocessing.IndexFile.Date
@@ -50,18 +51,17 @@ object EccoSpark {
   }
 
   def saveDate(date: Date): Unit = {
-
-    val schema = StructField("date", StringType)
-    val rdd: RDD[Row] = sparkContext.parallelize(List(Row(date.date)))
-    val df = spark.sqlContext.createDataFrame(rdd, StructType(List(schema)))
+    val rdd: RDD[Row] = sparkContext.parallelize(List(Row(0, date.date)))
+    val df = spark.sqlContext.createDataFrame(rdd, StructType(List(StructField("_id", IntegerType), StructField("date", StringType))))
     val writeConfig = WriteConfig(Map("uri" -> dateURI))
     MongoSpark.save(df, writeConfig)
   }
 
   def loadLastUpdateDate(): Date = {
     val readConfig = ReadConfig(Map("uri" -> dateURI))
-    val dates = MongoSpark.load(sparkContext, readConfig)
-    dates.map(date => Date(date.getString("date"))).sortBy(_.date, ascending = false).first()
+    val date = MongoSpark.load(sparkContext, readConfig)
+    Date(date.map(_.getString("date")).first())
+
   }
 
   //MongoSpark.load(spark, new ReadConfig(hadoopDB, "buoyMeta"))
