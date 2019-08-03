@@ -34,9 +34,9 @@ class NetCDFConverter(conversionFuncs: Seq[NetcdfFile => Any], schemaInfo: Seq[S
 
   def getSchema: StructType = StructType(schemaInfo)
 
-  def extractData(netcdfFile: NetcdfFile): Row = {
+  def extractData(netcdfFile: NetcdfFile): Seq[Any] = {
     // if you get an IllegalArgumentException on the following line it's probably because not
     // all conversion functions you provided created a List with the same size
-    Row.fromSeq(conversionFuncs.map(fn => fn(netcdfFile)))
+    conversionFuncs.map(fn => fn(netcdfFile))
   }
 }

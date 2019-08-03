@@ -8,16 +8,18 @@ import preprocessing.IndexFile.Date
 import ucar.nc2.NetcdfFile
 import java.net.URI
 
+import org.apache.spark.sql.types.{StringType, StructField, StructType}
+
 class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {
 
   //private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
   private val indexFile = new IndexFile(path = "/home/manuel/Downloads/ar_index_global_prof.txt")
 
   // TODO: maybe find better name
-  private def retrieveCurrentProgress(): Date = EccoSpark.loadLastUpdateDate() // DUMMY // should retrieve saved progress date
+  private def retrieveCurrentProgress(): Date = EccoSpark.loadLastUpdateDate() // should retrieve saved progress date
 
   // TODO: maybe find better name
-  private def saveCurrentProgress(progress: Date): Unit = EccoSpark.saveDate(progress) // DUMMY // should save new progress date
+  private def saveCurrentProgress(progress: Date): Unit = EccoSpark.saveDate(progress) // should save new progress date
 
   def update(): Unit = {
     //EccoSpark.saveDate(Date("24210729090951"))
@@ -39,9 +41,10 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
 
         //process and save bucketRDD
         val rows: RDD[Row] = bucketRdd.map {
-          entry => netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(indexFile.rootFTP + "/" + entry.path)))
+          entry => Row.fromSeq(netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(indexFile.rootFTP + "/" + entry.path))) :+ entry.date.date)
         }
-        EccoSpark.saveEccoData(rows, netCDFConverter.getSchema)
+        val schema = StructType(netCDFConverter.getSchema.toSeq :+ StructField("updateDate2", StringType))
+        EccoSpark.saveEccoData(rows, schema)
 
         saveCurrentProgress(maxDate)
         processBucket(maxDate)

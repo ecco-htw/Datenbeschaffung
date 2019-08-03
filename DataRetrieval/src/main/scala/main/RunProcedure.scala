@@ -50,9 +50,10 @@ object RunProcedure {
     //val fhl = rdd.map(row => rootFTP + "/" + row.getString(0))
     //fhl.foreach(saveDataMongoDB)
 
+
+    /*
     val rows: RDD[Row] = rdd.map(row => buoyNetCDFConverter.extractData(NetcdfFile.openInMemory(new URI(rootFTP + "/" + row._1))))
     rows.collect()
-    /*
 
     val dataFrame = spark.sqlContext.createDataFrame(rows, netCDFConverter.getSchema)
     dataFrame.write

@@ -60,9 +60,7 @@ object EccoSpark {
   def loadLastUpdateDate(): Date = {
     val readConfig = ReadConfig(Map("uri" -> dateURI))
     val date = MongoSpark.load(sparkContext, readConfig)
-    Date(date.map(_.getString("date")).first())
-
+    if (date.count() == 0) Date("00000000000000")
+    else Date(date.map(_.getString("date")).first())
   }
-
-  //MongoSpark.load(spark, new ReadConfig(hadoopDB, "buoyMeta"))
 }
