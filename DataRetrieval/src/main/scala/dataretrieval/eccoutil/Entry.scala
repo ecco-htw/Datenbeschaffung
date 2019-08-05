@@ -1,4 +1,4 @@
-package eccoutil
+package dataretrieval.eccoutil
 
 /*
 Represents an entry of the "IndexFile"-class

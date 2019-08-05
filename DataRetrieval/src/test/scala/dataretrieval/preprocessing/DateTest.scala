@@ -1,11 +1,11 @@
-package preprocessing
+package dataretrieval.preprocessing
 
 import org.scalatest.FunSuite
 import org.junit.runner.RunWith
 import org.scalatest.junit.JUnitRunner
-import preprocessing.IndexFile.Date
+import dataretrieval.preprocessing.IndexFile.Date
 
-
+/*
 @RunWith(classOf[JUnitRunner])
 class DateTest extends FunSuite {
   val smallestDate = Date("20181011200014")
@@ -61,4 +61,6 @@ class DateTest extends FunSuite {
   }
 
 }
+
+ */
 

@@ -54,12 +54,12 @@ Die Zeichnung kann durch importieren der zur Verfügung gestellten ECCO-Datenbes
 Datei in draw.io überarbeitet werden.
 ![ECCO-Datenbeschaffung-Skizze](ECCO-Datenbeschaffung-Skizze.png)
 
-### eccoutil/ArgoFloatException.scala
+### dataretrieval.eccoutil/ArgoFloatException.scala
 Die Datei 'ArgoFloatException' enthält wie der Name bereits andeutet eine eigene Exception um
 dem Nutzer des Programms ggf. eine sinnvolle Fehlermeldung zurückzugeben.
 
-### main/RunProcedure.scala
-In 'RunProcedure' befindet sich das Object mit der *main*-Methode um das Programm zu starten.
+### dataretrieval.main/RunProcedure.scala
+In 'RunProcedure' befindet sich das Object mit der *dataretrieval.main*-Methode um das Programm zu starten.
 Des Weiteren enthält die Datei die notwendigen Spark und MongoDB Konfigurationen, so wie zwei
 Methoden welche die erhobenen Daten in die Datenbank speichern.
 
@@ -76,7 +76,7 @@ Die Hilfsmethode *saveDataMongoDB* bekommt einen Pfad zu einer Meeresdaten-Datei
 speichert die Daten in einem vereinfachten Format in die Datenbank. Das vereinfachen
 der Meeresdaten übernimmt die Klasse *BuoyData*.
 
-### netcdfhandling/BuoyData.scala
+### dataretrieval.netcdfhandling/BuoyData.scala
 Die Klasse *BuoyData* wird mit einer URL zu einer NetCDF Datei initialisiert, die
 auf einem FTP Server liegt. Diese NetCDF-Datei kann dann in den Arbeitsspeicher in
 ein [Java NetCDF Objekt](https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/documentation.htm) gelesen werden. Das Java NetCDF Objekt kann dann über die BuoyData Klasse in
@@ -86,7 +86,7 @@ verschiedene Formate umgewandelt werden. Die Formate sind:
 * **Spark DataFrame**, das Schema für das DataFrame wird automatisch aus den NetCDF Dateien
  gefolgert
 
-### observer/FtpObserver.scala
+### dataretrieval.observer/FtpObserver.scala
 Die FtpObserver Klasse ist als Akka actor implementiert. Damit entspricht jede
 Instanz der Klasse einem Worker Thread. Wir benötigen für unseren Anwendungsfall
 nur einen Worker Thread.
@@ -99,7 +99,7 @@ Akka actors kommunizieren über Nachrichten, dafür müssen die Nachrichten die 
 * **Polling:** Startet eine Anfrage an den FTP Server ob der Index sich verändert hat
 * **Stop:** Dies beendet den Actor (Wird momentan nicht genutzt, da der Downloader langfristig laufen soll)
 
-### preprocessing/ThisWeekList.scala
+### dataretrieval.preprocessing/ThisWeekList.scala
 Die Klasse ThisWeekList lädt den Index zu den neu hinzugekommenen Daten auf dem FTP-Server
 in ein Spark DataFrame. Dabei enthält jede Spark Row des DataFrames die Daten zu einer
 der neu hinzugekommenen Dateien. Von den Daten werden bisher nur die relativen Pfade

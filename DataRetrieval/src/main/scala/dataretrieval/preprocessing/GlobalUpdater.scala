@@ -1,13 +1,12 @@
-package preprocessing
+package dataretrieval.preprocessing
 
-import main.EccoSpark
-import netcdfhandling.NetCDFConverter
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
-import preprocessing.IndexFile.Date
 import ucar.nc2.NetcdfFile
 import java.net.URI
 
+import dataretrieval.EccoSpark
+import dataretrieval.netcdfhandling.NetCDFConverter
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
 class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {

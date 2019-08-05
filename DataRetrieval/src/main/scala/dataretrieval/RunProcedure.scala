@@ -1,17 +1,11 @@
-package main
+package dataretrieval
 
 import java.net.URI
 
+import dataretrieval.netcdfhandling.buoyNetCDFConverter
+import dataretrieval.preprocessing.{GlobalList, GlobalUpdater}
 import org.apache.log4j.{Level, Logger}
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.{Row, SparkSession}
-import preprocessing.{GlobalList, GlobalUpdater, IndexFile, ThisWeekList}
-import netcdfhandling.buoyNetCDFConverter
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.types.{ArrayType, DoubleType, FloatType, IntegerType, StringType, StructField}
 import ucar.nc2.NetcdfFile
-
-import collection.JavaConverters._
 
 /** Main object to run argo-data retrieval.
   *

@@ -1,9 +1,6 @@
-package netcdfhandling
+package dataretrieval.netcdfhandling
 
-
-import org.apache.spark.SparkContext
-import org.apache.spark.sql.{Row, SQLContext}
-import org.apache.spark.sql.types.{FloatType, StructField, StructType}
+import org.apache.spark.sql.types.{StructField, StructType}
 import ucar.nc2._
 
 

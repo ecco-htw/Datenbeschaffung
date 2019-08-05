@@ -1,6 +1,6 @@
-package preprocessing
+package dataretrieval.preprocessing
 
-import main.EccoSpark
+import dataretrieval.EccoSpark
 import org.apache.spark.{SparkContext, SparkFiles}
 import org.apache.spark.rdd.RDD
 import preprocessing.IndexFile.{Date, IndexFileEntry}

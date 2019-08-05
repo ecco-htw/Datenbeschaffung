@@ -1,5 +1,7 @@
-import org.apache.spark.sql.types.{ArrayType, DoubleType, IntegerType, StringType, StructField}
-import netcdfhandling.NetCDFConverter.{extractFirstProfile, extractVariable}
+package dataretrieval
+
+import org.apache.spark.sql.types._
+import dataretrieval.netcdfhandling.NetCDFConverter.{extractFirstProfile,extractVariable}
 
 package object netcdfhandling {
   val buoyNetCDFConverter = NetCDFConverter(

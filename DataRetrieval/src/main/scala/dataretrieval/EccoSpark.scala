@@ -1,13 +1,12 @@
-package main
+package dataretrieval
 
 import com.mongodb.spark.MongoSpark
 import com.mongodb.spark.config.{ReadConfig, WriteConfig}
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.IntType
+import dataretrieval.preprocessing.IndexFile.Date
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.apache.spark.sql.{Row, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
-import preprocessing.IndexFile.Date
 
 object EccoSpark {
 
