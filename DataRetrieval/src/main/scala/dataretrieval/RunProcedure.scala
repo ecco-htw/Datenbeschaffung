@@ -2,7 +2,9 @@ package dataretrieval
 
 import java.net.URI
 
+import akka.actor.ActorSystem
 import dataretrieval.netcdfhandling.buoyNetCDFConverter
+import dataretrieval.observer.FtpObserver
 import dataretrieval.preprocessing.{GlobalList, GlobalUpdater, WeeklyUpdater}
 import org.apache.log4j.{Level, Logger}
 import ucar.nc2.NetcdfFile
@@ -18,48 +20,12 @@ object RunProcedure {
   val weeklyUpdater: WeeklyUpdater = new WeeklyUpdater(buoyNetCDFConverter)
   val globalUpdater: GlobalUpdater = new GlobalUpdater(buoyNetCDFConverter)
 
-  def main(args: Array[String]) {
-    val start_time = System.currentTimeMillis()
-    /** TIMER START */
-    /*
-    val index=new IndexFile()
-    val rdd=index.data
-    rdd.collect.foreach(x=>println(x.date.hour))
-     */
+  def main(args: Array[String]): Unit = {
 
-    //globalUpdater.update()
-    weeklyUpdater.update()
+    doGlobalUpdate()
 
-    /** TIMER END */
-    val end_time = System.currentTimeMillis()
-    println("time: " + (end_time-start_time))
-  }
-
-  def saveAll(start: Int, count: Int, global_list: GlobalList, rootFTP: String): Unit = {
-    // if (count < global_list.lines) {
-
-    println(start)
-    //val rdd = global_list.toRDD((start, start + count))
-    val rdd = EccoSpark.sparkContext.parallelize(global_list.getSubRDD((start, start + count)).collect())
-    //val fhl = rdd.map(row => rootFTP + "/" + row.getString(0)).collect().toList
-    //val fhl = rdd.map(row => rootFTP + "/" + row.getString(0))
-    //fhl.foreach(saveDataMongoDB)
-
-
-    /*
-    val rows: RDD[Row] = rdd.map(row => buoyNetCDFConverter.extractData(NetcdfFile.openInMemory(new URI(rootFTP + "/" + row._1))))
-    rows.collect()
-
-    val dataFrame = spark.sqlContext.createDataFrame(rows, netCDFConverter.getSchema)
-    dataFrame.write
-      .format("com.mongodb.spark.sql.DefaultSource")
-      .mode("append")
-      .save()
-
-     */
-
-    //saveAll(start + count, count, global_list, rootFTP)
-
+    val actorSystem = ActorSystem("eccoActorSystem")
+    val ftpObserver = actorSystem.actorOf(FtpObserver.props(doWeeklyUpdate), "ftpObserver")
   }
 
   /** Download the new argo data from: ftp://ftp.ifremer.fr/ifremer/argo/
@@ -116,4 +82,11 @@ object RunProcedure {
      */
   }
 
+  def doGlobalUpdate(): Unit = {
+    globalUpdater.update()
+  }
+
+  def doWeeklyUpdate(): Unit = {
+    weeklyUpdater.update()
+  }
 }
