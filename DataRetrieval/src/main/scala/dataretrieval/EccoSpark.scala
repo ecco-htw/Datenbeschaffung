@@ -16,7 +16,8 @@ object EccoSpark {
   private val hadoopUser = "ecco"
   // val hadoopPassword = sys.env("HTW_MONGO_PWD")
   private val hadoopDB = "ecco"
-  private val hadoopCollection = "buoyTest"
+  //private val hadoopCollection = "buoyTest"
+  private val hadoopCollection = "deleteThis"
   private val dateCollection = "latestProgress"
   //val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
   //val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "hadoop05.f4.htw-berlin.de")

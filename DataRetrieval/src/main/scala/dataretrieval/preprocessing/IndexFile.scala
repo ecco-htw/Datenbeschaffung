@@ -1,9 +1,9 @@
 package dataretrieval.preprocessing
 
 import dataretrieval.EccoSpark
+import dataretrieval.preprocessing.IndexFile.{Date, IndexFileEntry}
 import org.apache.spark.{SparkContext, SparkFiles}
 import org.apache.spark.rdd.RDD
-import preprocessing.IndexFile.{Date, IndexFileEntry}
 
 class IndexFile(path: String,
                 username: String = "anonymous",
@@ -11,15 +11,16 @@ class IndexFile(path: String,
 
   /** LOCAL FILE **/
   private[this] def fullpath: String = s"tmp/ar_index_this_week_prof.txt"
+
   val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fullpath, 30)
-  /****************/
+  /** **************/
 
   /** REMOTE FILE **/
   //private[this] def fullpath: String = s"ftp://$username:$password@$path"
   //EccoSpark.sparkContext.addFile(fullpath)
   //val fileName: String = SparkFiles.get(fullpath.split("/").last)
   //val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fileName, 30)
-  /*****************/
+  /** ***************/
 
   val headerLineCount: Int =
     fullRDD
@@ -43,7 +44,7 @@ object IndexFile {
     val minute: Int = date.substring(10, 12).toInt
     val second: Int = date.substring(12, 14).toInt
 
-    val units: List[Int] = List(year, month, day, hour, minute,second)
+    val units: List[Int] = List(year, month, day, hour, minute, second)
 
     def >(other: Date): Boolean = date > other.date
 
@@ -54,63 +55,8 @@ object IndexFile {
     def <=(other: Date): Boolean = date <= other.date
 
     def ==(other: Date): Boolean = date == other.date
-
-    /*
-    def >(other: Date): Boolean = {
-
-      def compare(ownUnits: List[Int], otherUnits: List[Int]): Boolean = {
-        if (ownUnits.head > otherUnits.head) true
-        else if (ownUnits.tail.isEmpty) false
-        else compare(ownUnits.tail, otherUnits.tail)
-      }
-
-      compare(units, other.units)
-    }
-
-    def <(other: Date): Boolean = {
-      def compare(ownUnits: List[Int], otherUnits: List[Int]): Boolean = {
-        if (ownUnits.head < otherUnits.head) true
-        else if (ownUnits.tail.isEmpty) false
-        else compare(ownUnits.tail, otherUnits.tail)
-      }
-
-      compare(units, other.units)
-    }
-
-    def >=(other: Date): Boolean = {
-      def compare(ownUnits: List[Int], otherUnits: List[Int]): Boolean = {
-        if (ownUnits.head > otherUnits.head) true
-        else if (ownUnits.head < otherUnits.head) false
-        else if (ownUnits.tail.isEmpty) true
-        else compare(ownUnits.tail, otherUnits.tail)
-      }
-
-      compare(units, other.units)
-    }
-
-    def <=(other: Date): Boolean = {
-      def compare(ownUnits: List[Int], otherUnits: List[Int]): Boolean = {
-        if (ownUnits.head < otherUnits.head) true
-        else if (ownUnits.head > otherUnits.head) false
-        else if (ownUnits.tail.isEmpty) true
-        else compare(ownUnits.tail, otherUnits.tail)
-      }
-
-      compare(units, other.units)
-    }
-
-    def ==(other: Date): Boolean = {
-      def compare(ownUnits: List[Int], otherUnits: List[Int]): Boolean = {
-        if (ownUnits.head != otherUnits.head) false
-        else if (ownUnits.tail.isEmpty) true
-        else compare(ownUnits.tail, otherUnits.tail)
-      }
-
-      compare(units, other.units)
-    }
-
-     */
   }
 
   case class IndexFileEntry(path: String, date: Date)
+
 }

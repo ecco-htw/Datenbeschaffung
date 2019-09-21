@@ -7,6 +7,7 @@ import java.net.URI
 
 import dataretrieval.EccoSpark
 import dataretrieval.netcdfhandling.NetCDFConverter
+import dataretrieval.preprocessing.IndexFile.Date
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
 class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {

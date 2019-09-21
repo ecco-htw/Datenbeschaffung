@@ -3,7 +3,7 @@ package dataretrieval
 import java.net.URI
 
 import dataretrieval.netcdfhandling.buoyNetCDFConverter
-import dataretrieval.preprocessing.{GlobalList, GlobalUpdater}
+import dataretrieval.preprocessing.{GlobalList, GlobalUpdater, WeeklyUpdater}
 import org.apache.log4j.{Level, Logger}
 import ucar.nc2.NetcdfFile
 
@@ -15,7 +15,7 @@ object RunProcedure {
 
   // Omit INFO log in console
   Logger.getLogger("org").setLevel(Level.WARN)
-
+  val weeklyUpdater: WeeklyUpdater = new WeeklyUpdater(buoyNetCDFConverter)
   val globalUpdater: GlobalUpdater = new GlobalUpdater(buoyNetCDFConverter)
 
   def main(args: Array[String]) {
@@ -27,7 +27,8 @@ object RunProcedure {
     rdd.collect.foreach(x=>println(x.date.hour))
      */
 
-    globalUpdater.update()
+    //globalUpdater.update()
+    weeklyUpdater.update()
 
     /** TIMER END */
     val end_time = System.currentTimeMillis()
@@ -81,6 +82,7 @@ object RunProcedure {
   }
 
   def analyzeVariables(netcdfFile: NetcdfFile, varnames: String*): Seq[(String, String)] = {
+
     if (varnames.isEmpty) netcdfFile.getVariables.asScala.map(v => (v.getNameAndDimensions, v.getDataType.toString))
     else varnames.map(name => {
       val v = netcdfFile.findVariable(name)
