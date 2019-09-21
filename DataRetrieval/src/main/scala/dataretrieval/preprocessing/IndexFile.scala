@@ -10,16 +10,16 @@ class IndexFile(path: String,
                 password: String = "empty") extends Serializable {
 
   /** LOCAL FILE **/
-  private[this] def fullpath: String = s"tmp/ar_index_this_week_prof.txt"
+  //private[this] def fullpath: String = s"tmp/ar_index_this_week_prof.txt"
 
-  val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fullpath, 30)
+  //val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fullpath, 30)
   /** **************/
 
   /** REMOTE FILE **/
-  //private[this] def fullpath: String = s"ftp://$username:$password@$path"
-  //EccoSpark.sparkContext.addFile(fullpath)
-  //val fileName: String = SparkFiles.get(fullpath.split("/").last)
-  //val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fileName, 30)
+  private[this] def fullpath: String = s"ftp://$username:$password@$path"
+  EccoSpark.sparkContext.addFile(fullpath)
+  val fileName: String = SparkFiles.get(fullpath.split("/").last)
+  val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fileName, 30)
   /** ***************/
 
   val headerLineCount: Int =

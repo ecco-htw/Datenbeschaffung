@@ -12,8 +12,8 @@ import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
 class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {
 
-  //private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
-  private val indexFile = new IndexFile(path = "/home/manuel/Downloads/ar_index_global_prof.txt")
+  private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
+  //private val indexFile = new IndexFile(path = "/home/manuel/Downloads/ar_index_global_prof.txt")
 
   // TODO: maybe find better name
   private def retrieveCurrentProgress(): Date = EccoSpark.loadLastUpdateDate() // should retrieve saved progress date
