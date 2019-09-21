@@ -1,7 +1,8 @@
 package dataretrieval
 
 import org.apache.spark.sql.types._
-import dataretrieval.netcdfhandling.NetCDFConverter.{extractFirstProfile,extractVariable}
+import dataretrieval.netcdfhandling.NetCDFConverter.{extractFirstProfile, extractVariable}
+import dataretrieval.preprocessing.IndexFile.IndexFileEntry
 
 package object netcdfhandling {
   val buoyNetCDFConverter = NetCDFConverter(
@@ -13,6 +14,7 @@ package object netcdfhandling {
     (extractFirstProfile[Array[Float]]("PSAL", _.map(_.toDouble)), StructField("PSAL", ArrayType(DoubleType))),
     (extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),
     (extractFirstProfile[Double]("LATITUDE"), StructField("latitude", DoubleType)),
-    (extractVariable[Array[Char]]("DATE_UPDATE", _.mkString.trim), StructField("dateUpdate", StringType))
+    (extractVariable[Array[Char]]("DATE_UPDATE", _.mkString.trim), StructField("dateUpdate", StringType)),
+    ((indexFileEntry: IndexFileEntry) => indexFileEntry.date, StructField("dateUpdate2", StringType))
   )
 }

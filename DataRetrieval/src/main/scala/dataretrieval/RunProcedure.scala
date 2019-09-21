@@ -81,6 +81,7 @@ object RunProcedure {
     //    saveDataMongoDB(weeklist.head)
   }
 
+  /*
   def analyzeVariables(netcdfFile: NetcdfFile, varnames: String*): Seq[(String, String)] = {
 
     if (varnames.isEmpty) netcdfFile.getVariables.asScala.map(v => (v.getNameAndDimensions, v.getDataType.toString))
@@ -89,6 +90,8 @@ object RunProcedure {
       (v.getNameAndDimensions, v.getDataType.toString)
     })
   }
+
+   */
 
   /** Store argo-data in mongodb of one specific NetCDF file.
     *

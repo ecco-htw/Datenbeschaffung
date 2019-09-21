@@ -29,7 +29,7 @@ class IndexFile(path: String,
   val data: RDD[IndexFileEntry] = fullRDD.zipWithIndex.filter(_._2 > headerLineCount)
     .map(lineAndIndex => {
       val args = lineAndIndex._1.split(",")
-      IndexFileEntry(args.head, Date(args.last))
+      IndexFileEntry(rootFTP + "/" + args.head, Date(args.last))
     })
 }
 
