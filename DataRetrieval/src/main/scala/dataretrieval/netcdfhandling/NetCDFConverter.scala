@@ -1,5 +1,7 @@
 package dataretrieval.netcdfhandling
 
+import java.net.URI
+
 import dataretrieval.preprocessing.IndexFile
 import dataretrieval.preprocessing.IndexFile.IndexFileEntry
 import org.apache.spark.sql.types.{StructField, StructType}
@@ -19,13 +21,13 @@ object NetCDFConverter {
   }
 
   def extractFirstProfile[T](name: String, convFn: T => Any = (a: T) => identity(a))(indexFileEntry: IndexFileEntry): Any = {
-    val netcdfFile = NetcdfFile.openInMemory(indexFileEntry.path)
+    val netcdfFile = NetcdfFile.openInMemory(new URI(indexFileEntry.path))
     val ndJavaArray = netcdfFile.findVariable(name).read().copyToNDJavaArray().asInstanceOf[Array[T]].head
     convFn(ndJavaArray)
   }
 
   def extractVariable[T](name: String, convFn: T => Any = (a: T) => identity(a))(indexFileEntry: IndexFileEntry): Any = {
-    val netcdfFile = NetcdfFile.openInMemory(indexFileEntry.path)
+    val netcdfFile = NetcdfFile.openInMemory(new URI(indexFileEntry.path))
     val ndJavaArray = netcdfFile.findVariable(name).read().copyToNDJavaArray().asInstanceOf[T]
     convFn(ndJavaArray)
   }
