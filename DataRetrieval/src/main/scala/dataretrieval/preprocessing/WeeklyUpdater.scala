@@ -16,7 +16,7 @@ class WeeklyUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
     val rows: RDD[Row] = indexFile.data.map {
       entry => Row.fromSeq(netCDFConverter.extractData(NetcdfFile.openInMemory(new URI(indexFile.rootFTP + "/" + entry.path))) :+ entry.date.date)
     }
-    val schema = StructType(netCDFConverter.getSchema.toSeq :+ StructField("updateDate2", StringType))
+    val schema = StructType(netCDFConverter.getSchema.toSeq)
     EccoSpark.saveEccoData(rows, schema)
   }
 
