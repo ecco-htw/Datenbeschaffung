@@ -13,15 +13,15 @@ Damit das Programm laufen kann sind Authentifizierungsdaten notwendig, diese wer
 über Umgebungsvariablen in das Programm gelesen. Die benötigten Umgebungsvariablen
 sind die Folgenden:
 
-* HTW_MONGO_USER
-* HTW_MONGO_PWD
-* HTW_MONGO_DB
-* HTW_MONGO_PORT
-* HTW_MONGO_HOST
+* MONGO_HOST
+* MONGO_PORT
+* MONGO_USER
+* MONGO_PASSWORD
+* MONGO_DB
 
 Aus Sicherheitsgründen veröffentlichen wir die zugehörigen Werte nicht.
 
-**Wichtiger Hinweis:** Beim setzen der Umgebungsvariablen kann es sein, dass der Rechner neugestartet werden muss, damit die 
+**Wichtiger Hinweis:** Beim Setzen der Umgebungsvariablen kann es sein, dass der Rechner neugestartet werden muss, damit die 
 Umgebungsvariablen korrekt gelesen werden können.
 
 ## Programm starten
