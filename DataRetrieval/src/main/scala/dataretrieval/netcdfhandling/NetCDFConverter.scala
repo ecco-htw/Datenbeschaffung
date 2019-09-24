@@ -1,5 +1,6 @@
 package dataretrieval.netcdfhandling
 
+import java.io.IOException
 import java.net.URI
 
 import dataretrieval.preprocessing.IndexFile
@@ -22,13 +23,17 @@ object NetCDFConverter {
   }
 
   private def getVariable(netcdfFilePath: String, variableName: String): Option[Object] = {
-    val netcdfFile = NetcdfFile.openInMemory(new URI(netcdfFilePath))
-    val netcdfVar: Variable = netcdfFile.findVariable(variableName)
-    if (netcdfVar == null) {
-      Logger.getLogger("org").warn(s"The variable $variableName does not exist in NetCDF file $netcdfFilePath. This file will be skipped.")
-      None
+    try {
+      val netcdfFile = NetcdfFile.openInMemory(new URI(netcdfFilePath))
+      val netcdfVar: Variable = netcdfFile.findVariable(variableName)
+      if (netcdfVar == null) {
+        Logger.getLogger("org").warn(s"The variable $variableName does not exist in NetCDF file $netcdfFilePath. This file will be skipped.")
+        None
+      }
+      else Some(netcdfVar.read().copyToNDJavaArray())
+    } catch {
+      case e: IOException => None
     }
-    else Some(netcdfVar.read().copyToNDJavaArray())
   }
 
   def extractFirstProfile[T](name: String, convFn: T => Any = (a: T) => identity(a))(indexFileEntry: IndexFileEntry): Option[Any] = {
