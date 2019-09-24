@@ -15,7 +15,8 @@ object EccoSpark {
   private val mongoUser: String = sys.env.getOrElse("MONGO_USER", throw new IllegalStateException("The environment variable MONGO_USER is not set."))
   private val mongoPassword: String = sys.env.getOrElse("MONGO_PASSWORD", throw new IllegalStateException("The environment variable MONGO_PASSWORD is not set."))
   private val mongoDB: String = sys.env.getOrElse("MONGO_DB", throw new IllegalStateException("The environment variable MONGO_DB is not set."))
-  private val dateURI = s"mongodb://$mongoUser:$mongoPassword@$mongoHost:$mongoPort/$mongoDB"
+  private val mongoCollection: String = sys.env.getOrElse("MONGO_COLLECTION", throw new IllegalStateException("The environment variable MONGO_COLLECTION is not set."))
+  private val dateURI = s"mongodb://$mongoUser:$mongoPassword@$mongoHost:$mongoPort/$mongoDB.$mongoCollection"
 
 
   // Basic Spark configuration. Use 'buoy' as mongodb collection.
