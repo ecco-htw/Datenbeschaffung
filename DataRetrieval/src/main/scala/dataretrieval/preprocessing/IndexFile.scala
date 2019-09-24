@@ -2,7 +2,7 @@ package dataretrieval.preprocessing
 
 import dataretrieval.EccoSpark
 import dataretrieval.preprocessing.IndexFile.{Date, IndexFileEntry}
-import org.apache.spark.{SparkContext, SparkFiles}
+import org.apache.spark.SparkFiles
 import org.apache.spark.rdd.RDD
 
 class IndexFile(path: String,

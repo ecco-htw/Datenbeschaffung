@@ -1,13 +1,11 @@
 package dataretrieval.preprocessing
 
-import java.net.URI
 
 import dataretrieval.EccoSpark
 import dataretrieval.netcdfhandling.NetCDFConverter
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.types.{StringType, StructField, StructType}
-import ucar.nc2.NetcdfFile
+import org.apache.spark.sql.types.StructType
 
 class WeeklyUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {
   private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt")
