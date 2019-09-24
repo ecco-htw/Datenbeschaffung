@@ -21,8 +21,7 @@ sind die Folgenden:
 
 Aus Sicherheitsgründen veröffentlichen wir die zugehörigen Werte nicht.
 
-**Wichtiger Hinweis:** Beim Setzen der Umgebungsvariablen kann es sein, dass der Rechner neugestartet werden muss, damit die 
-Umgebungsvariablen korrekt gelesen werden können.
+**Wichtiger Hinweis:** Die Umgebungsvariablen werden auf dem Server über `/home/local/.profile` gesetzt. Wird sie angepasst, sollte der Server neu gestartet werden.
 
 ## Programm starten
 Vor dem Starten: Bitte siehe Kapitel *Vorraussetzung*.
