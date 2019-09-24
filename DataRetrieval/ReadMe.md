@@ -18,6 +18,7 @@ sind die Folgenden:
 * MONGO_USER
 * MONGO_PASSWORD
 * MONGO_DB
+* MONGO_COLLECTION
 
 Aus Sicherheitsgründen veröffentlichen wir die zugehörigen Werte nicht.
 
@@ -27,15 +28,6 @@ Aus Sicherheitsgründen veröffentlichen wir die zugehörigen Werte nicht.
 Vor dem Starten: Bitte siehe Kapitel *Vorraussetzung*.
 
 * Im Terminal: `sbt run`
-* *Alternativ kann die letzte komprimierte Version ausgeführt werden.* Im Terminal: `./target/universal/stage/bin/htw-ecco`
-
-## Produktions-Einsatz / Deployment
-Das Programm wird mit `sbt stage` komprimiert. Das Ergebnis befindet sich in
-*target/universal/stage* dieses Verzeichnis wurde dann an die für uns zur
-Verfügung gestellte Virtuelle Maschine gesendet mittels *scp*, wo das Programm
-dann letztendlich mit `./bin/htw-ecco` ausgeführt wurde. Damit das Programm auch nach
-dem Beenden der SSH-Sitzung weiterläuft wurde das Programm *screen* verwendet, mit dem
-Konsolen-Sitzungen verwaltet werden können.
 
 ## Dokumentation
 Der Quelltext wurde nach den [Scala Doc Konventionen](https://docs.scala-lang.org/style/scaladoc.html) geschrieben.
