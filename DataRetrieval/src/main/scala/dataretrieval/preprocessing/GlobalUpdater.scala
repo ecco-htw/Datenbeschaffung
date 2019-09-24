@@ -8,6 +8,7 @@ import java.net.URI
 import dataretrieval.EccoSpark
 import dataretrieval.netcdfhandling.NetCDFConverter
 import dataretrieval.preprocessing.IndexFile.Date
+import org.apache.log4j.Logger
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
 class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {
@@ -40,13 +41,16 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
         val bucketRdd = EccoSpark.sparkContext.parallelize(bucket)
 
         //process and save bucketRDD
-        val rows: RDD[Row] = bucketRdd.map {
-          entry => Row.fromSeq(netCDFConverter.extractData(entry))
+        val rows: RDD[Row] = bucketRdd.flatMap {
+          entry => netCDFConverter.extractData(entry).map {
+            list => Row.fromSeq(list)
+          }
         }
         val schema = StructType(netCDFConverter.getSchema)
         EccoSpark.saveEccoData(rows, schema)
-
         saveCurrentProgress(maxDate)
+        Logger.getLogger("org").info(s"saved ${rows.count()} entries to database")
+
         processBucket(maxDate)
       }
     }

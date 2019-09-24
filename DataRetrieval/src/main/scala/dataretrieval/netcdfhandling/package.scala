@@ -14,7 +14,10 @@ package object netcdfhandling {
     (extractFirstProfile[Array[Float]]("PSAL", _.map(_.toDouble)), StructField("PSAL", ArrayType(DoubleType))),
     (extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),
     (extractFirstProfile[Double]("LATITUDE"), StructField("latitude", DoubleType)),
-    (extractVariable[Array[Char]]("DATE_UPDATE", _.mkString.trim), StructField("dateUpdate", StringType)),
-    ((indexFileEntry: IndexFileEntry) => Some(indexFileEntry.date.str), StructField("dateUpdate2", StringType))
+    (extractFirstProfile[Int]("CONFIG_MISSION_NUMBER"), StructField("configMissionNumber", IntegerType)),
+    (extractFirstProfile[Array[Char]]("PLATFORM_TYPE", _.mkString.trim), StructField("platformType", StringType)),
+    (extractFirstProfile[Array[Char]]("PROJECT_NAME", _.mkString.trim), StructField("projectName", StringType)),
+    (extractFirstProfile[Array[Char]]("PLATFORM_NUMBER", _.mkString.trim), StructField("platformNumber", StringType)),
+    ((indexFileEntry: IndexFileEntry) => Some(indexFileEntry.date.str), StructField("dateUpdate", StringType))
   )
 }

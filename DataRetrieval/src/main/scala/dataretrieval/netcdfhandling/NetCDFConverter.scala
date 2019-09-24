@@ -4,6 +4,7 @@ import java.net.URI
 
 import dataretrieval.preprocessing.IndexFile
 import dataretrieval.preprocessing.IndexFile.IndexFileEntry
+import org.apache.log4j.Logger
 import org.apache.spark.sql.types.{StructField, StructType}
 import ucar.nc2._
 
@@ -20,21 +21,24 @@ object NetCDFConverter {
     new NetCDFConverter(conversionFuncs, schemaInfo)
   }
 
-  private def getVariable(netcdfFilePath: String, variableName: String): Object = {
+  private def getVariable(netcdfFilePath: String, variableName: String): Option[Object] = {
     val netcdfFile = NetcdfFile.openInMemory(new URI(netcdfFilePath))
-    netcdfFile.findVariable(variableName).read().copyToNDJavaArray()
+    val netcdfVar: Variable = netcdfFile.findVariable(variableName)
+    if (netcdfVar == null) {
+      Logger.getLogger("org").warn(s"The variable $variableName does not exist in NetCDF file $netcdfFilePath. This file will be skipped.")
+      None
+    }
+    else Some(netcdfVar.read().copyToNDJavaArray())
   }
 
   def extractFirstProfile[T](name: String, convFn: T => Any = (a: T) => identity(a))(indexFileEntry: IndexFileEntry): Option[Any] = {
-    val variable = getVariable(indexFileEntry.path, name)
-    if (variable == null) None
-    else Some(convFn(variable.asInstanceOf[Array[T]].head))
+    extractVariable[Array[T]](name, v => convFn(v.head))(indexFileEntry)
   }
 
   def extractVariable[T](name: String, convFn: T => Any = (a: T) => identity(a))(indexFileEntry: IndexFileEntry): Option[Any] = {
-    val variable = getVariable(indexFileEntry.path, name)
-    if (variable == null) None
-    else Some(convFn(variable.asInstanceOf[T]))
+    getVariable(indexFileEntry.path, name).map {
+      v => convFn(v.asInstanceOf[T])
+    }
   }
 }
 
@@ -42,9 +46,11 @@ class NetCDFConverter(conversionFuncs: Seq[IndexFileEntry => Option[Any]], schem
 
   def getSchema: StructType = StructType(schemaInfo)
 
-  def extractData(indexFileEntry: IndexFileEntry): Seq[Any] = {
+  def extractData(indexFileEntry: IndexFileEntry): Option[Seq[Any]] = {
     // if you get an IllegalArgumentException on the following line it's probably because not
     // all conversion functions you provided created a List with the same size
-    conversionFuncs.flatMap(fn => fn(indexFileEntry))
+    val list = conversionFuncs.map(fn => fn(indexFileEntry))
+    if (list.contains(None)) None
+    else Some(list.flatten)
   }
 }

@@ -13,8 +13,10 @@ class WeeklyUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
   private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_this_week_prof.txt")
 
   def update(): Unit = {
-    val rows: RDD[Row] = indexFile.data.map {
-      entry => Row.fromSeq(netCDFConverter.extractData(entry))
+    val rows: RDD[Row] = indexFile.data.flatMap {
+      entry => netCDFConverter.extractData(entry).map {
+        list => Row.fromSeq(list)
+      }
     }
     val schema = StructType(netCDFConverter.getSchema)
     EccoSpark.saveEccoData(rows, schema)
