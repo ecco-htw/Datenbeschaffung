@@ -16,16 +16,17 @@ object EccoSpark {
   private val mongoPassword: String = sys.env.getOrElse("MONGO_PASSWORD", throw new IllegalStateException("The environment variable MONGO_PASSWORD is not set."))
   private val mongoDB: String = sys.env.getOrElse("MONGO_DB", throw new IllegalStateException("The environment variable MONGO_DB is not set."))
   private val mongoCollection: String = sys.env.getOrElse("MONGO_COLLECTION", throw new IllegalStateException("The environment variable MONGO_COLLECTION is not set."))
-  private val dateURI = s"mongodb://$mongoUser:$mongoPassword@$mongoHost:$mongoPort/$mongoDB.$mongoCollection"
+  private val buoyDataURI = s"mongodb://$mongoUser:$mongoPassword@$mongoHost:$mongoPort/$mongoDB.$mongoCollection"
+  private val latestProgressURI = s"mongodb://$mongoUser:$mongoPassword@$mongoHost:$mongoPort/$mongoDB.latestProgress"
 
 
   // Basic Spark configuration. Use 'buoy' as mongodb collection.
   private val sparkConfig = new SparkConf()
     .setMaster("local[8]")
     .setAppName("HTW-Argo")
-    .set("spark.ui.port", "4051")
-    .set("spark.mongodb.output.uri", dateURI)
-    .set("spark.mongodb.input.uri", dateURI)
+    .set("spark.ui.port", "4050")
+    .set("spark.mongodb.output.uri", buoyDataURI)
+    .set("spark.mongodb.input.uri", buoyDataURI)
   val sparkContext = new SparkContext(sparkConfig)
   val spark: SparkSession = SparkSession
     .builder()
@@ -44,14 +45,14 @@ object EccoSpark {
   def saveDate(date: Date): Unit = {
     val rdd: RDD[Row] = sparkContext.parallelize(List(Row(0, date.str)))
     val df = spark.sqlContext.createDataFrame(rdd, StructType(List(StructField("_id", IntegerType), StructField("date", StringType))))
-    val writeConfig = WriteConfig(Map("uri" -> dateURI))
+    val writeConfig = WriteConfig(Map("uri" -> latestProgressURI))
     MongoSpark.save(df, writeConfig)
   }
 
   def loadLastUpdateDate(): Date = {
-    val readConfig = ReadConfig(Map("uri" -> dateURI))
+    val readConfig = ReadConfig(Map("uri" -> latestProgressURI))
     val date = MongoSpark.load(sparkContext, readConfig)
     if (date.count() == 0) Date("00000000000000")
-    else Date(date.map(_.getString("date")).first())
+    else Date(date.first().getString("date"))
   }
 }
