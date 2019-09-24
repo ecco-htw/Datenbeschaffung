@@ -10,31 +10,20 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 object EccoSpark {
 
-  // Use environment variables for authentication
-
-  private val hadoopPassword = "kd23.S.W"
-  private val hadoopUser = "ecco"
-  // val hadoopPassword = sys.env("HTW_MONGO_PWD")
-  private val hadoopDB = "ecco"
-  //private val hadoopCollection = "buoyTest"
-  private val hadoopCollection = "deleteThis"
-  private val dateCollection = "latestProgress"
-  //val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
-  //val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "hadoop05.f4.htw-berlin.de")
-  //private val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27017")
-  private val hadoopPort = sys.env.getOrElse("HTW_MONGO_PORT", "27020")
-  private val hadoopHost = sys.env.getOrElse("HTW_MONGO_HOST", "localhost")
-  private val dateURI = s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.$dateCollection"
-
+  private val mongoHost: String = sys.env.getOrElse("MONGO_HOST", throw new IllegalStateException("The environment variable MONGO_HOST is not set."))
+  private val mongoPort: String = sys.env.getOrElse("MONGO_PORT", throw new IllegalStateException("The environment variable MONGO_PORT is not set."))
+  private val mongoUser: String = sys.env.getOrElse("MONGO_USER", throw new IllegalStateException("The environment variable MONGO_USER is not set."))
+  private val mongoPassword: String = sys.env.getOrElse("MONGO_PASSWORD", throw new IllegalStateException("The environment variable MONGO_PASSWORD is not set."))
+  private val mongoDBName: String = sys.env.getOrElse("MONGO_DB_NAME", throw new IllegalStateException("The environment variable MONGO_DB_NAME is not set."))
+  private val dateURI = s"mongodb://$mongoUser:$mongoPassword@$mongoHost:$mongoPort/$mongoDBName"
 
   // Basic Spark configuration. Use 'buoy' as mongodb collection.
   private val sparkConfig = new SparkConf()
     .setMaster("local[8]")
     .setAppName("HTW-Argo")
-    //.set("spark.executor.memory", "471m")
     .set("spark.ui.port", "4050")
-    .set("spark.mongodb.output.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.$hadoopCollection")
-    .set("spark.mongodb.input.uri", s"mongodb://$hadoopUser:$hadoopPassword@$hadoopHost:$hadoopPort/$hadoopDB.$hadoopCollection?readPreference=primaryPreferred")
+    .set("spark.mongodb.output.uri", dateURI)
+    .set("spark.mongodb.input.uri", dateURI)
   val sparkContext = new SparkContext(sparkConfig)
   val spark: SparkSession = SparkSession
     .builder()
