@@ -15,31 +15,36 @@ object NetCDFConverter {
     *                        convFn = function that extracts a specific Column of a NetCdf File and converts it to a scala List
     *                        fieldSchema = StructField defining the name and type of the field
     */
-  def apply(conversionInfos: (IndexFileEntry => Any, StructField)*): NetCDFConverter = {
+  def apply(conversionInfos: (IndexFileEntry => Option[Any], StructField)*): NetCDFConverter = {
     val (conversionFuncs, schemaInfo) = conversionInfos.unzip
     new NetCDFConverter(conversionFuncs, schemaInfo)
   }
 
-  def extractFirstProfile[T](name: String, convFn: T => Any = (a: T) => identity(a))(indexFileEntry: IndexFileEntry): Any = {
-    val netcdfFile = NetcdfFile.openInMemory(new URI(indexFileEntry.path))
-    val ndJavaArray = netcdfFile.findVariable(name).read().copyToNDJavaArray().asInstanceOf[Array[T]].head
-    convFn(ndJavaArray)
+  private def getVariable(netcdfFilePath: String, variableName: String): Object = {
+    val netcdfFile = NetcdfFile.openInMemory(new URI(netcdfFilePath))
+    netcdfFile.findVariable(variableName).read().copyToNDJavaArray()
   }
 
-  def extractVariable[T](name: String, convFn: T => Any = (a: T) => identity(a))(indexFileEntry: IndexFileEntry): Any = {
-    val netcdfFile = NetcdfFile.openInMemory(new URI(indexFileEntry.path))
-    val ndJavaArray = netcdfFile.findVariable(name).read().copyToNDJavaArray().asInstanceOf[T]
-    convFn(ndJavaArray)
+  def extractFirstProfile[T](name: String, convFn: T => Any = (a: T) => identity(a))(indexFileEntry: IndexFileEntry): Option[Any] = {
+    val variable = getVariable(indexFileEntry.path, name)
+    if (variable == null) None
+    else Some(convFn(variable.asInstanceOf[Array[T]].head))
+  }
+
+  def extractVariable[T](name: String, convFn: T => Any = (a: T) => identity(a))(indexFileEntry: IndexFileEntry): Option[Any] = {
+    val variable = getVariable(indexFileEntry.path, name)
+    if (variable == null) None
+    else Some(convFn(variable.asInstanceOf[T]))
   }
 }
 
-class NetCDFConverter(conversionFuncs: Seq[IndexFileEntry => Any], schemaInfo: Seq[StructField]) extends Serializable {
+class NetCDFConverter(conversionFuncs: Seq[IndexFileEntry => Option[Any]], schemaInfo: Seq[StructField]) extends Serializable {
 
   def getSchema: StructType = StructType(schemaInfo)
 
   def extractData(indexFileEntry: IndexFileEntry): Seq[Any] = {
     // if you get an IllegalArgumentException on the following line it's probably because not
     // all conversion functions you provided created a List with the same size
-    conversionFuncs.map(fn => fn(indexFileEntry))
+    conversionFuncs.flatMap(fn => fn(indexFileEntry))
   }
 }

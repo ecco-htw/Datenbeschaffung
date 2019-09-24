@@ -22,7 +22,7 @@ object EccoSpark {
   private val sparkConfig = new SparkConf()
     .setMaster("local[8]")
     .setAppName("HTW-Argo")
-    .set("spark.ui.port", "4050")
+    .set("spark.ui.port", "4051")
     .set("spark.mongodb.output.uri", dateURI)
     .set("spark.mongodb.input.uri", dateURI)
   val sparkContext = new SparkContext(sparkConfig)
