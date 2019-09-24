@@ -15,6 +15,6 @@ package object netcdfhandling {
     (extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),
     (extractFirstProfile[Double]("LATITUDE"), StructField("latitude", DoubleType)),
     (extractVariable[Array[Char]]("DATE_UPDATE", _.mkString.trim), StructField("dateUpdate", StringType)),
-    ((indexFileEntry: IndexFileEntry) => indexFileEntry.date, StructField("dateUpdate2", StringType))
+    ((indexFileEntry: IndexFileEntry) => indexFileEntry.date.str, StructField("dateUpdate2", StringType))
   )
 }

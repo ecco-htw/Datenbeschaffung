@@ -10,16 +10,16 @@ class IndexFile(path: String,
                 password: String = "empty") extends Serializable {
 
   /** LOCAL FILE **/
-  private[this] def fullpath: String = s"tmp/ar_index_this_week_prof.txt"
+  //private[this] def fullpath: String = s"tmp/ar_index_this_week_prof.txt"
 
-  val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fullpath, 30)
+  //val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fullpath, 30)
   /** **************/
 
   /** REMOTE FILE **/
-  //private[this] def fullpath: String = s"ftp://$username:$password@$path"
-  //EccoSpark.sparkContext.addFile(fullpath)
-  //val fileName: String = SparkFiles.get(fullpath.split("/").last)
-  //val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fileName, 30)
+  private[this] def fullpath: String = s"ftp://$username:$password@$path"
+  EccoSpark.sparkContext.addFile(fullpath)
+  val fileName: String = SparkFiles.get(fullpath.split("/").last)
+  val fullRDD: RDD[String] = EccoSpark.sparkContext.textFile(fileName, 30)
   /** ***************/
 
   val headerLineCount: Int =
@@ -35,26 +35,26 @@ class IndexFile(path: String,
 
 object IndexFile {
 
-  case class Date(date: String) {
+  case class Date(str: String) {
 
-    val year: Int = date.substring(0, 4).toInt
-    val month: Int = date.substring(4, 6).toInt
-    val day: Int = date.substring(6, 8).toInt
-    val hour: Int = date.substring(8, 10).toInt
-    val minute: Int = date.substring(10, 12).toInt
-    val second: Int = date.substring(12, 14).toInt
+    val year: Int = str.substring(0, 4).toInt
+    val month: Int = str.substring(4, 6).toInt
+    val day: Int = str.substring(6, 8).toInt
+    val hour: Int = str.substring(8, 10).toInt
+    val minute: Int = str.substring(10, 12).toInt
+    val second: Int = str.substring(12, 14).toInt
 
     val units: List[Int] = List(year, month, day, hour, minute, second)
 
-    def >(other: Date): Boolean = date > other.date
+    def >(other: Date): Boolean = str > other.str
 
-    def <(other: Date): Boolean = date < other.date
+    def <(other: Date): Boolean = str < other.str
 
-    def >=(other: Date): Boolean = date >= other.date
+    def >=(other: Date): Boolean = str >= other.str
 
-    def <=(other: Date): Boolean = date <= other.date
+    def <=(other: Date): Boolean = str <= other.str
 
-    def ==(other: Date): Boolean = date == other.date
+    def ==(other: Date): Boolean = str == other.str
   }
 
   case class IndexFileEntry(path: String, date: Date)

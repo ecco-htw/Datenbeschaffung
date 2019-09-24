@@ -12,8 +12,8 @@ import org.apache.spark.sql.types.{StringType, StructField, StructType}
 
 class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {
 
-  //private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
-  private val indexFile = new IndexFile(path = "/home/manuel/Downloads/ar_index_global_prof.txt")
+  private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
+  //private val indexFile = new IndexFile(path = "/home/manuel/Downloads/ar_index_global_prof.txt")
 
   // TODO: maybe find better name
   private def retrieveCurrentProgress(): Date = EccoSpark.loadLastUpdateDate() // should retrieve saved progress date
@@ -25,16 +25,16 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
     //EccoSpark.saveDate(Date("24210729090951"))
     //println(EccoSpark.loadLastUpdateDate())
     println("updating")
-    val minBucketSize = 1000
-    val fullRdd = indexFile.data.sortBy(_.date.date).zipWithIndex()
+    val minBucketSize = 100
+    val fullRdd = indexFile.data.sortBy(_.date.str).zipWithIndex()
 
     def processBucket(progress: Date): Unit = {
-      val remaining = fullRdd.filter { case (entry, index) => entry.date.date > progress.date }
+      val remaining = fullRdd.filter { case (entry, index) => entry.date.str > progress.str }
       if (remaining.count() > 0) {
         val maxIndex = remaining.first()._2 + minBucketSize
         val maxDate = remaining.filter { case (entry, index) => index <= maxIndex }.sortBy(_._2, ascending = false).first()._1.date
         val bucket = remaining.flatMap {
-          case (entry, index) if entry.date.date <= maxDate.date => Some(entry)
+          case (entry, index) if entry.date.str <= maxDate.str => Some(entry)
           case _ => None
         }.collect()
         val bucketRdd = EccoSpark.sparkContext.parallelize(bucket)
