@@ -91,6 +91,9 @@ Die Klasse ist auf Index-Files vom Typ WeeklyIndex ausgerichtet.<br/>
 Soll ein GlobalIndex gehandhabt werden, sollte die Klasse GlobalUpdater verwendet werden. 
 
 ### EccoSpark.scala
+EccoSpark ist ein Global verfügbares Objekt, welches anderen Klassen verwendet wird, um Daten aus der Datenbank zu erhalten oder Daten in ihr zu speichern.
+In EccoSpark werden alle nötigen Einstellungen bezüglich der Datenbank konfiguriert.
+
 ### netcdfhandling/NetCDFConverter.scala
 ### netcdfhandling/Package.scala
 
