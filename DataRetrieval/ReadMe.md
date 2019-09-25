@@ -102,6 +102,19 @@ In EccoSpark werden alle nötigen Einstellungen bezüglich der Datenbank konfigu
 Der NetCDFConverter wird von anderen Klassen verwendet um die Daten aus den NetCDF-Dateien zu extrahieren und in ein in der Datenbank speicherbares Format zu bringen.
 
 ### netcdfhandling/Package.scala
+Hier wird das NetCDFConverter Object konfiguriert, das zum konvertieren der NetCDF-Dateien verwendet wird.
+Dazu wird createNetCDFConverter aufgerufen mit folgender Datenstruktur:
+Seq( <br/>
+(conversionFunction, structField), <br\>
+... <br/>
+) <br/>
+<br/>
+conversionFunction ist eine Funktion, die ein IndexFileEntry empfängt und eine Variable beliebigen Typs zurück gibt.
+In den meisten Fällen wird hier die NetCDF-Datei geladen und eine Variable extrahiert. <br\>
+<br/>
+structField definiert das schema zum Abspeichern in die Datenbank <br/>
+<br/>
+Hier noch ein paar Beispiele: <br/>
 (extractFirstProfile[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),<br/>
 (extractFirstProfile[Array[Char]]("FLOAT_SERIAL_NO", _.mkString.trim), StructField("floatSerialNo", StringType)),<br/>
 (extractFirstProfile[Array[Float]]("PRES", _.map(_.toDouble)), StructField("PRES", ArrayType(DoubleType))),<br/>
