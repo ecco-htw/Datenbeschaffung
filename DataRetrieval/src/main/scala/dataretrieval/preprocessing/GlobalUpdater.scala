@@ -18,7 +18,7 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
 
   def update(): Unit = {
     println("updating")
-    val minBucketSize = 500
+    val minBucketSize = 1000
     val fullRdd = indexFile.data.sortBy(_.date.str).zipWithIndex()
 
     def processBucket(progress: Date): Unit = {
@@ -30,7 +30,7 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
           case (entry, index) if entry.date.str <= maxDate.str => Some(entry)
           case _ => None
         }.collect()
-        val bucketRdd = EccoSpark.sparkContext.parallelize(bucket)
+        val bucketRdd = EccoSpark.sparkContext.parallelize(bucket, numSlices = 32)
 
         //process and save bucketRDD
         val rows: RDD[Row] = bucketRdd.flatMap {
