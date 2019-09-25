@@ -69,8 +69,8 @@ verschiedene Formate umgewandelt werden. Die Formate sind:
  gefolgert
  //TODO:
 ### preprocessing/IndexFile.scala
-Dieser Klasse repräsentiert eine Index Datei (GlobalList/WeeklyList) des FTP-Servers. Ihre Hauptaufgabe ist es die Einträge der Index Datei auf Objekte der Case-Klasse *IndexFileEntry* abzubilden. Die für uns relevanten und letzendlich in der Case-Class gespeicherten Felder eines Eintrages sind "dateUpdate"(*date*) und der Subpfad der dazugehörigen NetCDF-Datei(*path*). <br/>
-Andere Module können über das Feld *data*(RDD) auf die IndexFileEntry-Objekte zugreifen.
+Dieser Klasse repräsentiert eine Index Datei (GlobalList/WeeklyList) des FTP-Servers. Ihre Hauptaufgabe ist es die Einträge der Index Datei auf Objekte der Case-Klasse *IndexFileEntry* abzubilden. Die für uns relevanten und letzendlich in der Case-Class gespeicherten Felder eines Eintrages sind "dateUpdate" (*date*) und der Subpfad der dazugehörigen NetCDF-Datei (*path*). <br/>
+Andere Module können über das Feld *data* (ein Spark-RDD) auf die IndexFileEntry-Objekte zugreifen.
 ### preprocessing/GlobalUpdater.scala
 ### preprocessing/WeeklyUpdater.scala
 ### EccoSpark.scala
