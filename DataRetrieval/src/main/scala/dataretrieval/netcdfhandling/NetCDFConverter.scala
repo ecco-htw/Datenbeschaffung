@@ -3,12 +3,10 @@ package dataretrieval.netcdfhandling
 import java.io.IOException
 import java.net.URI
 
-import dataretrieval.preprocessing.IndexFile
 import dataretrieval.preprocessing.IndexFile.IndexFileEntry
 import org.apache.log4j.Logger
 import org.apache.spark.sql.types.{StructField, StructType}
 import ucar.nc2._
-
 
 object NetCDFConverter {
   /**

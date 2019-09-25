@@ -1,30 +1,22 @@
 package dataretrieval.preprocessing
 
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.Row
-import ucar.nc2.NetcdfFile
-import java.net.URI
-
 import dataretrieval.EccoSpark
 import dataretrieval.netcdfhandling.NetCDFConverter
 import dataretrieval.preprocessing.IndexFile.Date
 import org.apache.log4j.Logger
-import org.apache.spark.sql.types.{StringType, StructField, StructType}
+import org.apache.spark.rdd.RDD
+import org.apache.spark.sql.Row
+import org.apache.spark.sql.types.StructType
 
 class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serializable {
 
   private val indexFile = new IndexFile(path = "ftp.ifremer.fr/ifremer/argo/ar_index_global_prof.txt")
-  //private val indexFile = new IndexFile(path = "/home/manuel/Downloads/ar_index_global_prof.txt")
 
-  // TODO: maybe find better name
-  private def retrieveCurrentProgress(): Date = EccoSpark.loadLastUpdateDate() // should retrieve saved progress date
+  private def retrieveCurrentProgress(): Date = EccoSpark.loadLastUpdateDate() // retrieves saved progress date
 
-  // TODO: maybe find better name
-  private def saveCurrentProgress(progress: Date): Unit = EccoSpark.saveDate(progress) // should save new progress date
+  private def saveCurrentProgress(progress: Date): Unit = EccoSpark.saveDate(progress) // saves new progress date
 
   def update(): Unit = {
-    //EccoSpark.saveDate(Date("24210729090951"))
-    //println(EccoSpark.loadLastUpdateDate())
     println("updating")
     val minBucketSize = 500
     val fullRdd = indexFile.data.sortBy(_.date.str).zipWithIndex()

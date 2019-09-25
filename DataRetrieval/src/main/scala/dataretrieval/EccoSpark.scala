@@ -19,8 +19,7 @@ object EccoSpark {
   private val buoyDataURI = s"mongodb://$mongoUser:$mongoPassword@$mongoHost:$mongoPort/$mongoDB.$mongoCollection"
   private val latestProgressURI = s"mongodb://$mongoUser:$mongoPassword@$mongoHost:$mongoPort/$mongoDB.latestProgress"
 
-
-  // Basic Spark configuration. Use 'buoy' as mongodb collection.
+  // Basic Spark configuration.
   private val sparkConfig = new SparkConf()
     .setMaster("local[8]")
     .setAppName("HTW-Argo")
