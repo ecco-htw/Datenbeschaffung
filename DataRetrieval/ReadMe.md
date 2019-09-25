@@ -83,6 +83,9 @@ Ist ein solcher Teilprozess erfolgreich abgeschlossen, wird das *date*-Feld des 
 Dieses Vorgehen ermöglicht es, im Falle eines vorzeitigem Beenden des Update-Prozesses, nicht wieder am Anfang des GlobalIndex mit dem Abarbeiten beginnen zu müssen. Stattdessen fragt die *update*-Methode das zuletzt gespeicherte Datum aus der Datenbank ab und übergibt dies an *processBucket*.
 
 ### preprocessing/WeeklyUpdater.scala
+WeeklyUpdater lädt die NetCDF Dateien, deren Pfade in einem IndexFile Objekt hinterlegt sind, in ein Spark RDD und nutzt dann ein NetCDFConverter-Obekt um relevante Daten aus diesen zu extrahieren und in der Datenbank zu speichern.<br/>
+Die Klasse ist auf Index-Files vom Typ WeeklyIndex ausgerichtet. Soll ein GlobalIndex gehandhabt wrden, sollte die Klasse GlobalUpdater verwendet werden.
+
 ### EccoSpark.scala
 ### netcdfhandling/NetCDFConverter.scala
 ### netcdfhandling/Package.scala
