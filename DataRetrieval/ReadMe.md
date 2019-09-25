@@ -109,7 +109,6 @@ Der NetCDFConverter wird von anderen Klassen verwendet um die Daten aus den NetC
 ((indexFileEntry: IndexFileEntry) => Some(indexFileEntry.date.str), StructField("dateUpdate", StringType))<br/>
 
 ### observer/FtpObserver.scala
-//Stimmt noch <br/>
 Die FtpObserver Klasse ist als Akka actor implementiert. Damit entspricht jede
 Instanz der Klasse einem Worker Thread. Wir benötigen für unseren Anwendungsfall
 nur einen Worker Thread.
