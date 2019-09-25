@@ -26,13 +26,19 @@ Die Umgebungsvariablen werden auf dem Server über `/home/local/.profile` gesetz
 Vor dem Starten: Bitte siehe Kapitel *Vorraussetzung*.
 
 ### auf dem Server
-* Im Terminal: `sbt run`
+```
+sbt run
+```
 
 ### lokal
 ```
 $ ssh -L 127.0.0.1:27020:hadoop05.f4.htw-berlin.de:27020 local@ecco.f4.htw-berlin.de
 ```
+In anderem Terminal:
 Lokal Environment-Variablen setzen wie in `/home/local/.profile` auf dem Server, nur mit `MONGO_HOST=localhost`
+```
+sbt run
+```
 
 ## Dokumentation
 Der Quelltext wurde nach den [Scala Doc Konventionen](https://docs.scala-lang.org/style/scaladoc.html) geschrieben.
