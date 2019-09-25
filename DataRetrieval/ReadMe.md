@@ -1,3 +1,7 @@
+# Allgemeine Infos zum Projekt (unabhängig von den Einzelprojekten)
+
+[siehe hier](https://github.com/ecco-htw/Datenverarbeitung/blob/master/README.md)
+
 # Daten-Management im Rahmen des HTW ECCO Projektstudiums
 
 Scala Spark Programm zur Datenbeschaffung und Datenspeicherung
