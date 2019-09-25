@@ -1,10 +1,10 @@
-# Allgemeine Infos zum Projekt (unabhängig von den Einzelprojekten)
-
-[siehe hier](https://github.com/ecco-htw/Datenverarbeitung/blob/master/README.md)
-
 # Daten-Management im Rahmen des HTW ECCO Projektstudiums
 
 Scala Spark Programm zur Datenbeschaffung und Datenspeicherung
+
+## Server, Zugänge und Umgang mit Screen
+
+Informationen zu genutzen Servern, sowie nötige Zugänge und Umgang mit Screen sind im readme der [Datenverarbeitung](https://github.com/ecco-htw/Datenverarbeitung) angegeben.
 
 ## Vorraussetzung
 ### IDE
