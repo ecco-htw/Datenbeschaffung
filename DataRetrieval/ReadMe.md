@@ -69,9 +69,15 @@ verschiedene Formate umgewandelt werden. Die Formate sind:
  gefolgert
  //TODO:
 ### preprocessing/IndexFile.scala
-Dieser Klasse repräsentiert eine Index Datei (GlobalList/WeeklyList) des FTP-Servers. Ihre Hauptaufgabe ist es die Einträge der Index Datei auf Objekte der Case-Klasse *IndexFileEntry* abzubilden. Die für uns relevanten und letzendlich in der Case-Class gespeicherten Felder eines Eintrages sind "dateUpdate" (*date*) und der Subpfad der dazugehörigen NetCDF-Datei (*path*). <br/>
+Diese Klasse repräsentiert eine Index Datei (GlobalList/WeeklyList) des FTP-Servers. Ihre Hauptaufgabe ist es die Einträge der Index Datei auf Objekte der Case-Klasse *IndexFileEntry* abzubilden. Die für uns relevanten und letzendlich in der Case-Class gespeicherten Felder eines Eintrages sind "dateUpdate" (*date*) und der Subpfad der dazugehörigen NetCDF-Datei (*path*). <br/>
 Andere Module können über das Feld *data* (ein Spark-RDD) auf die IndexFileEntry-Objekte zugreifen.
 ### preprocessing/GlobalUpdater.scala
+GlobalUpdater lädt die NetCDF Dateien, deren Pfade in einem IndexFile Objekt hinterlegt sind, in ein Spark RDD und nutzt dann ein NetCDFConverter-Obekt um relevante Daten aus diesen zu extrahieren und in der Datenbank zu speichern. <br/>
+Die Klasse ist auf Index-Files vom Typ GlobalIndex ausgerichtet. Soll ein WeeklyIndex gehandhabt haben sollte die Klasse WeeklyUpdater verwendet werden. <br/>
+Die Methode *update* sortiert zu Beginn die Einträge des GlobalIndex nach derem "date"-Attribut. Anschließend ruft sie die Methode *processBucket(progress:Date)* auf, in welcher ein Teil ("Bucket") der Datenmenge abgearbeitet wird.<br/>
+Ist ein solcher Teilprozess erfolgreich abgeschlossen, wird das *date*-Feld des letzten Eintrags des Buckets in einer Collection/Table der Datenbank gespeichert. Anschließend ruft sich *processBucket* rekursiv auf und übergibt das zuletzt abgearbeitete Datum, welches als Startposition im sortierten GlobalIndex des nächsten Buckets verwendet wird. </br>
+Dieses Vorgehen ermöglicht es, im Falle eines vorzeitigem Beenden des Update-Prozesses, nicht wieder am Anfang des GlobalIndex mit dem Abarbeiten beginnen zu müssen. Stattdessen fragt die *update*-Methode das zuletzt gespeicherte Datum aus der Datenbank ab und übergibt dies an *processBucket*.
+
 ### preprocessing/WeeklyUpdater.scala
 ### EccoSpark.scala
 ### netcdfhandling/NetCDFConverter.scala
