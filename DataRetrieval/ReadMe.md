@@ -57,17 +57,6 @@ Nachdem das "Global Update" erfolgreich ausgeführt wurde, geht das Programm unt
 
 Existiert diese wird sie automatisch durch die Callback-Methode des Observers (*doWeeklyUpdate*) mithilfe eines Objekts der Klasse *WeeklyUpdater* heruntergeladen und ihre Inhalte in der DB gespeichert. 
 
-### netcdfhandling/BuoyData.scala
-///Nicht mehr vorhanden <br/>
-Die Klasse *BuoyData* wird mit einer URL zu einer NetCDF Datei initialisiert, die
-auf einem FTP Server liegt. Diese NetCDF-Datei kann dann in den Arbeitsspeicher in
-ein [Java NetCDF Objekt](https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/documentation.htm) gelesen werden. Das Java NetCDF Objekt kann dann über die BuoyData Klasse in
-verschiedene Formate umgewandelt werden. Die Formate sind:
-* **Scala immutable Map**, wobei die Schlüssel die Variablennamen sind und die Werte die jeweiligen Daten
-* **Spark RDD**, dabei enthält jede Spark Row die Daten zu einem Messzyklus einer Boje
-* **Spark DataFrame**, das Schema für das DataFrame wird automatisch aus den NetCDF Dateien
- gefolgert
- //TODO:
 ### preprocessing/IndexFile.scala
 Diese Klasse repräsentiert eine Index Datei (GlobalList/WeeklyList) des FTP-Servers. Ihre Hauptaufgabe ist es die Einträge der Index Datei auf Objekte der Case-Klasse *IndexFileEntry* abzubilden. Die für uns relevanten und letzendlich in der Case-Class gespeicherten Felder eines Eintrages sind "dateUpdate" (*date*) und der Subpfad der dazugehörigen NetCDF-Datei (*path*). <br/>
 Andere Module können über das Feld *data* (ein Spark-RDD) auf die IndexFileEntry-Objekte zugreifen.
@@ -110,13 +99,6 @@ Akka actors kommunizieren über Nachrichten, dafür müssen die Nachrichten die 
 * **Start:** Dies startet den Initialisierungsprozess und setzt einen Akka timer mit dem der actor sich selbst die Polling Nachricht in einem bestimmten Zeitintervall (einen Tag) übermittelt
 * **Polling:** Startet eine Anfrage an den FTP Server ob der Index sich verändert hat
 * **Stop:** Dies beendet den Actor (Wird momentan nicht genutzt, da der Downloader langfristig laufen soll)
-
-### preprocessing/ThisWeekList.scala
-//nicht mehr vorhanden <br/>
-Die Klasse ThisWeekList lädt den Index zu den neu hinzugekommenen Daten auf dem FTP-Server
-in ein Spark DataFrame. Dabei enthält jede Spark Row des DataFrames die Daten zu einer
-der neu hinzugekommenen Dateien. Von den Daten werden bisher nur die relativen Pfade
-der Dateien genutzt.
 
 ## Hilfreiche Links
 * [Argo DOI](http://www.argodatamgt.org/Access-to-data/Argo-DOI-Digital-Object-Identifier)
