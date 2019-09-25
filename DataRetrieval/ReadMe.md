@@ -73,7 +73,9 @@ Diese Klasse repräsentiert eine Index Datei (GlobalList/WeeklyList) des FTP-Ser
 Andere Module können über das Feld *data* (ein Spark-RDD) auf die IndexFileEntry-Objekte zugreifen.
 ### preprocessing/GlobalUpdater.scala
 GlobalUpdater lädt die NetCDF Dateien, deren Pfade in einem IndexFile Objekt hinterlegt sind, in ein Spark RDD und nutzt dann ein NetCDFConverter-Obekt um relevante Daten aus diesen zu extrahieren und in der Datenbank zu speichern. <br/>
-Die Klasse ist auf Index-Files vom Typ GlobalIndex ausgerichtet. Soll ein WeeklyIndex gehandhabt wrden, sollte die Klasse WeeklyUpdater verwendet werden. 
+Die Klasse ist auf Index-Files vom Typ GlobalIndex ausgerichtet.<br/>
+(ftp://ftp.ifremer.fr/ifremer/argo/ -> ar_index_global_prof.txt) <br/> 
+Soll ein WeeklyIndex gehandhabt werden, sollte die Klasse WeeklyUpdater verwendet werden. 
 
 
 Die Methode *update* sortiert zu Beginn die Einträge des GlobalIndex nach derem "date"-Attribut. Anschließend ruft sie die Methode *processBucket(progress:Date)* auf, in welcher ein Teil ("Bucket") der Datenmenge abgearbeitet wird.<br/>
@@ -84,7 +86,9 @@ Dieses Vorgehen ermöglicht es, im Falle eines vorzeitigem Beenden des Update-Pr
 
 ### preprocessing/WeeklyUpdater.scala
 WeeklyUpdater lädt die NetCDF Dateien, deren Pfade in einem IndexFile Objekt hinterlegt sind, in ein Spark RDD und nutzt dann ein NetCDFConverter-Obekt um relevante Daten aus diesen zu extrahieren und in der Datenbank zu speichern.<br/>
-Die Klasse ist auf Index-Files vom Typ WeeklyIndex ausgerichtet. Soll ein GlobalIndex gehandhabt wrden, sollte die Klasse GlobalUpdater verwendet werden.
+Die Klasse ist auf Index-Files vom Typ WeeklyIndex ausgerichtet.<br/>
+(ftp://ftp.ifremer.fr/ifremer/argo/ -> ar_index_this_week_prof.txt) <br/>
+Soll ein GlobalIndex gehandhabt werden, sollte die Klasse GlobalUpdater verwendet werden. 
 
 ### EccoSpark.scala
 ### netcdfhandling/NetCDFConverter.scala
