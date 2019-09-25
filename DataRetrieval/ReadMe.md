@@ -58,6 +58,7 @@ Nachdem das "Global Update" erfolgreich ausgeführt wurde, geht das Programm unt
 Existiert diese wird sie automatisch durch die Callback-Methode des Observers (*doWeeklyUpdate*) mithilfe eines Objekts der Klasse *WeeklyUpdater* heruntergeladen und ihre Inhalte in der DB gespeichert. 
 
 ### netcdfhandling/BuoyData.scala
+///Nicht mehr vorhanden
 Die Klasse *BuoyData* wird mit einer URL zu einer NetCDF Datei initialisiert, die
 auf einem FTP Server liegt. Diese NetCDF-Datei kann dann in den Arbeitsspeicher in
 ein [Java NetCDF Objekt](https://www.unidata.ucar.edu/software/thredds/current/netcdf-java/documentation.htm) gelesen werden. Das Java NetCDF Objekt kann dann über die BuoyData Klasse in
@@ -66,8 +67,16 @@ verschiedene Formate umgewandelt werden. Die Formate sind:
 * **Spark RDD**, dabei enthält jede Spark Row die Daten zu einem Messzyklus einer Boje
 * **Spark DataFrame**, das Schema für das DataFrame wird automatisch aus den NetCDF Dateien
  gefolgert
+ //TODO:
+### preprocessing/IndexFile.scala
+### preprocessing/GlobalUpdater.scala
+### preprocessing/WeeklyUpdater.scala
+### EccoSpark.scala
+### netcdfhandling/NetCDFConverter.scala
+### netcdfhandling/Package.scala
 
 ### observer/FtpObserver.scala
+//Stimmt noch
 Die FtpObserver Klasse ist als Akka actor implementiert. Damit entspricht jede
 Instanz der Klasse einem Worker Thread. Wir benötigen für unseren Anwendungsfall
 nur einen Worker Thread.
@@ -81,6 +90,7 @@ Akka actors kommunizieren über Nachrichten, dafür müssen die Nachrichten die 
 * **Stop:** Dies beendet den Actor (Wird momentan nicht genutzt, da der Downloader langfristig laufen soll)
 
 ### preprocessing/ThisWeekList.scala
+//nicht mehr vorhanden
 Die Klasse ThisWeekList lädt den Index zu den neu hinzugekommenen Daten auf dem FTP-Server
 in ein Spark DataFrame. Dabei enthält jede Spark Row des DataFrames die Daten zu einer
 der neu hinzugekommenen Dateien. Von den Daten werden bisher nur die relativen Pfade
