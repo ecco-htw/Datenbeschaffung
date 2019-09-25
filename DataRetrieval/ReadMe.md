@@ -60,7 +60,7 @@ Die Zeichnung kann durch importieren der zur Verfügung gestellten ECCO-Datenbes
 Datei in draw.io überarbeitet werden.
 ![ECCO-Datenbeschaffung-Skizze](ECCO-Datenbeschaffung-Skizze.png)
 
-### eccoutil/ArgoFloatException.scala
+### dataretrieval.eccoutil/ArgoFloatException.scala
 Die Datei 'ArgoFloatException' enthält wie der Name bereits andeutet eine eigene Exception um
 dem Nutzer des Programms ggf. eine sinnvolle Fehlermeldung zurückzugeben.
 
@@ -108,7 +108,7 @@ Der NetCDFConverter wird von anderen Klassen verwendet um die Daten aus den NetC
 (extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),<br/>
 ((indexFileEntry: IndexFileEntry) => Some(indexFileEntry.date.str), StructField("dateUpdate", StringType))<br/>
 
-### observer/FtpObserver.scala
+### dataretrieval.observer/FtpObserver.scala
 Die FtpObserver Klasse ist als Akka actor implementiert. Damit entspricht jede
 Instanz der Klasse einem Worker Thread. Wir benötigen für unseren Anwendungsfall
 nur einen Worker Thread.

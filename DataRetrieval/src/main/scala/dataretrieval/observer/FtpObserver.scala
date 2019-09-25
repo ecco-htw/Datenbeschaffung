@@ -1,15 +1,9 @@
-package observer
+package dataretrieval.observer
 
-import java.io.IOException
-import org.apache.commons.net.ftp
+import akka.actor.{Actor, ActorLogging, Props, Timers}
 import org.apache.commons.net.ftp.FTPClient
-import akka.actor.Actor
-import akka.actor.Timers
-import akka.actor.Props
+
 import scala.concurrent.duration._
-import scala.concurrent.Await
-import scala.concurrent.Future
-import akka.actor.ActorLogging
 
 /** Companion Object as recommended practice for Akka actors 
   * 
@@ -28,7 +22,7 @@ case object Polling
 case object Stop
 /** Class to check for modifications at the ftp server permanently in request intervals.
   *
-  * @constructor Creates a ftp observer object.
+  * @constructor Creates a ftp dataretrieval.observer object.
   * @param callback Is a function that is called by the actor when relevant modifications were detected at the ftp 
   * @param server Ftp server to observe
   * @param port Ftp port (default ftp port 21)

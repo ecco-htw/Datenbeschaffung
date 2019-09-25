@@ -1,4 +1,4 @@
-package eccoutil
+package dataretrieval.eccoutil
 
 /** Customizable exception
   *
