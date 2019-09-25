@@ -102,11 +102,11 @@ In EccoSpark werden alle nötigen Einstellungen bezüglich der Datenbank konfigu
 Der NetCDFConverter wird von anderen Klassen verwendet um die Daten aus den NetCDF-Dateien zu extrahieren und in ein in der Datenbank speicherbares Format zu bringen.
 
 ### netcdfhandling/Package.scala
-(extractFirstProfile[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),
-(extractFirstProfile[Array[Char]]("FLOAT_SERIAL_NO", _.mkString.trim), StructField("floatSerialNo", StringType)),
-(extractFirstProfile[Array[Float]]("PRES", _.map(_.toDouble)), StructField("PRES", ArrayType(DoubleType))),
-(extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),
-((indexFileEntry: IndexFileEntry) => Some(indexFileEntry.date.str), StructField("dateUpdate", StringType))
+(extractFirstProfile[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),<br/>
+(extractFirstProfile[Array[Char]]("FLOAT_SERIAL_NO", _.mkString.trim), StructField("floatSerialNo", StringType)),<br/>
+(extractFirstProfile[Array[Float]]("PRES", _.map(_.toDouble)), StructField("PRES", ArrayType(DoubleType))),<br/>
+(extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),<br/>
+((indexFileEntry: IndexFileEntry) => Some(indexFileEntry.date.str), StructField("dateUpdate", StringType))<br/>
 
 ### observer/FtpObserver.scala
 //Stimmt noch <br/>
