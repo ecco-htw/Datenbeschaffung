@@ -51,21 +51,8 @@ dem Nutzer des Programms ggf. eine sinnvolle Fehlermeldung zurückzugeben.
 
 ### main/RunProcedure.scala
 In 'RunProcedure' befindet sich das Object mit der *main*-Methode um das Programm zu starten.
-Des Weiteren enthält die Datei die notwendigen Spark und MongoDB Konfigurationen, so wie zwei
-Methoden welche die erhobenen Daten in die Datenbank speichern.
-
-Die *main*-Methode startet einen Akka actor, der die Datenquelle (FTP-Server) beobachtet.
-Bei dem Akka actor wird eine 'callback'-Methode registriert, sodass bei Veränderungen die
-callback Methode aufgerufen wird, welche die neuen Daten herunterlädt und in die Datenbank
-speichert.
-
-Die Methode *saveAllFromThisWeekList* lädt den Index zu den neu hinzugekommenen Daten auf dem  FTP-Server herunter und erstellt daraus eine Liste von Pfaden, wobei jeder Pfad zu einer neuen
-Meeresdaten-Datei zeigt. Für jedes Element der Liste wird dann die Methode *saveDataMongoDB*
-aufgerufen.
-
-Die Hilfsmethode *saveDataMongoDB* bekommt einen Pfad zu einer Meeresdaten-Datei und
-speichert die Daten in einem vereinfachten Format in die Datenbank. Das vereinfachen
-der Meeresdaten übernimmt die Klasse *BuoyData*.
+Wird das Programm gestartet, würd zunnächst ein "Global Update" durchgeführt. Es wird ein Objekt der Klasse "Global Updater" verwendet, um den Stand der Datenbank mit dem des FTP-Servers abzugleichen und alle in der DB fehlenden Einträge in dieser zu speichern (*globalUpdater.update()*).
+Nachdem das "Global Update" erfolgreich ausgeführt wurde, geht das Programm unter Verwendung des Ftp-Observers in einen Status über, in dem es in regelmäßigen Abständen nach einer neuen "Weekly List" vom FTP-Server fragt. Existiert diese wird sie automatisch durch die Callback-Methode des Observers (*doWeeklyUpdate*) mithilfe eines Objekts der Klasse *WeeklyUpdater* heruntergeladen und deren Inhalte in der DB gespeichert. 
 
 ### netcdfhandling/BuoyData.scala
 Die Klasse *BuoyData* wird mit einer URL zu einer NetCDF Datei initialisiert, die
