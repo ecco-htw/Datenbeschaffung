@@ -1,10 +1,10 @@
+# Allgemeine Infos zum Projekt (unabhängig von den Einzelprojekten)
+
+[siehe hier](https://github.com/ecco-htw/Datenverarbeitung/blob/master/README.md)
+
 # Daten-Management im Rahmen des HTW ECCO Projektstudiums
 
 Scala Spark Programm zur Datenbeschaffung und Datenspeicherung
-
-## Server, Zugänge und Umgang mit Screen
-
-Informationen zu genutzen Servern, sowie nötige Zugänge und Umgang mit Screen sind im readme der [Datenverarbeitung](https://github.com/ecco-htw/Datenverarbeitung) angegeben.
 
 ## Vorraussetzung
 ### IDE
@@ -99,7 +99,14 @@ EccoSpark ist ein Global verfügbares Objekt, welches von anderen Klassen verwen
 In EccoSpark werden alle nötigen Einstellungen bezüglich der Datenbank konfiguriert.
 
 ### netcdfhandling/NetCDFConverter.scala
+Der NetCDFConverter wird von anderen Klassen verwendet um die Daten aus den NetCDF-Dateien zu extrahieren und in ein in der Datenbank speicherbares Format zu bringen.
+
 ### netcdfhandling/Package.scala
+(extractFirstProfile[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),
+(extractFirstProfile[Array[Char]]("FLOAT_SERIAL_NO", _.mkString.trim), StructField("floatSerialNo", StringType)),
+(extractFirstProfile[Array[Float]]("PRES", _.map(_.toDouble)), StructField("PRES", ArrayType(DoubleType))),
+(extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),
+((indexFileEntry: IndexFileEntry) => Some(indexFileEntry.date.str), StructField("dateUpdate", StringType))
 
 ### observer/FtpObserver.scala
 //Stimmt noch <br/>
