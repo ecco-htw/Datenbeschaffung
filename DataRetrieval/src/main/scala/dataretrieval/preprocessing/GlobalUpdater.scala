@@ -14,11 +14,11 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
 
   private def retrieveCurrentProgress(): Date = EccoSpark.loadLastUpdateDate() // retrieves saved progress date
 
-  private def saveCurrentProgress(progress: Date): Unit = EccoSpark.saveDate(progress) // saves new progress date
+  private def saveCurrentProgress(progress: Date): Unit = EccoSpark.saveLastUpdateDate(progress) // saves new progress date
 
   def update(): Unit = {
     println("updating")
-    val minBucketSize = 100
+    val minBucketSize = 1000
     val fullRdd = indexFile.data.sortBy(_.date.str).zipWithIndex()
 
     def processBucket(progress: Date): Unit = {
@@ -30,7 +30,7 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
           case (entry, index) if entry.date.str <= maxDate.str => Some(entry)
           case _ => None
         }.collect()
-        val bucketRdd = EccoSpark.sparkContext.parallelize(bucket)
+        val bucketRdd = EccoSpark.sparkContext.parallelize(bucket, numSlices = 32)
 
         //process and save bucketRDD
         val rows: RDD[Row] = bucketRdd.flatMap {
@@ -41,7 +41,8 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
         val schema = StructType(netCDFConverter.getSchema)
         EccoSpark.saveEccoData(rows, schema)
         saveCurrentProgress(maxDate)
-        Logger.getLogger("org").info(s"saved ${rows.count()} entries to database")
+        //uncomment the following line only for debugging purposes (it is very slow)
+        //Logger.getLogger("org").info(s"saved ${rows.count()} entries to database")
 
         processBucket(maxDate)
       }

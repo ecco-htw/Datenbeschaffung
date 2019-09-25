@@ -1,11 +1,11 @@
 package dataretrieval
 
 import org.apache.spark.sql.types._
-import dataretrieval.netcdfhandling.NetCDFConverter.{extractFirstProfile, extractVariable}
+import dataretrieval.netcdfhandling.NetCDFConverter.{createNetCDFConverter, extractFirstProfile, extractVariable}
 import dataretrieval.preprocessing.IndexFile.IndexFileEntry
 
 package object netcdfhandling {
-  val buoyNetCDFConverter = NetCDFConverter(
+  val buoyNetCDFConverter: NetCDFConverter = createNetCDFConverter(
     (extractFirstProfile[Double]("JULD"), StructField("juld", DoubleType)),
     (extractFirstProfile[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),
     (extractFirstProfile[Array[Char]]("FLOAT_SERIAL_NO", _.mkString.trim), StructField("floatSerialNo", StringType)),
