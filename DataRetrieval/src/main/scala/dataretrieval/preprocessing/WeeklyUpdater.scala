@@ -19,7 +19,7 @@ class WeeklyUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
     val schema = StructType(netCDFConverter.getSchema)
     EccoSpark.saveEccoData(rows, schema)
 
-    val latestDate = indexFile.data.sortBy(_.date, ascending = false).first().date
+    val latestDate = indexFile.data.sortBy(_.date.str, ascending = false).first().date
     EccoSpark.saveLastUpdateDate(latestDate)
   }
 
