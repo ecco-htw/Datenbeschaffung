@@ -1,4 +1,4 @@
-# Daten Management im Rahmen des HTW ECCO Projektstudiums
+# Daten-Management im Rahmen des HTW ECCO Projektstudiums
 
 Scala Spark Programm zur Datenbeschaffung und Datenspeicherung
 
@@ -20,14 +20,19 @@ sind die Folgenden:
 * MONGO_DB
 * MONGO_COLLECTION
 
-Aus Sicherheitsgründen veröffentlichen wir die zugehörigen Werte nicht.
-
-**Wichtiger Hinweis:** Die Umgebungsvariablen werden auf dem Server über `/home/local/.profile` gesetzt. Wird sie angepasst, sollte der Server neu gestartet werden.
+Die Umgebungsvariablen werden auf dem Server über `/home/local/.profile` gesetzt. Wird sie angepasst, sollte der Server neu gestartet werden.
 
 ## Programm starten
 Vor dem Starten: Bitte siehe Kapitel *Vorraussetzung*.
 
+### auf dem Server
 * Im Terminal: `sbt run`
+
+### lokal
+```
+$ ssh -L 127.0.0.1:27020:hadoop05.f4.htw-berlin.de:27020 local@ecco.f4.htw-berlin.de
+```
+Lokal Environment-Variablen setzen wie in `/home/local/.profile` auf dem Server, nur mit `MONGO_HOST=localhost`
 
 ## Dokumentation
 Der Quelltext wurde nach den [Scala Doc Konventionen](https://docs.scala-lang.org/style/scaladoc.html) geschrieben.
