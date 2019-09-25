@@ -26,7 +26,7 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
     //EccoSpark.saveDate(Date("24210729090951"))
     //println(EccoSpark.loadLastUpdateDate())
     println("updating")
-    val minBucketSize = 100
+    val minBucketSize = 500
     val fullRdd = indexFile.data.sortBy(_.date.str).zipWithIndex()
 
     def processBucket(progress: Date): Unit = {
@@ -49,7 +49,8 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
         val schema = StructType(netCDFConverter.getSchema)
         EccoSpark.saveEccoData(rows, schema)
         saveCurrentProgress(maxDate)
-        Logger.getLogger("org").info(s"saved ${rows.count()} entries to database")
+        //uncomment the following line only for debugging purposes (it is very slow)
+        //Logger.getLogger("org").info(s"saved ${rows.count()} entries to database")
 
         processBucket(maxDate)
       }
