@@ -14,7 +14,7 @@ class GlobalUpdater(private val netCDFConverter: NetCDFConverter) extends Serial
 
   private def retrieveCurrentProgress(): Date = EccoSpark.loadLastUpdateDate() // retrieves saved progress date
 
-  private def saveCurrentProgress(progress: Date): Unit = EccoSpark.saveDate(progress) // saves new progress date
+  private def saveCurrentProgress(progress: Date): Unit = EccoSpark.saveLastUpdateDate(progress) // saves new progress date
 
   def update(): Unit = {
     println("updating")
