@@ -73,9 +73,13 @@ Diese Klasse repräsentiert eine Index Datei (GlobalList/WeeklyList) des FTP-Ser
 Andere Module können über das Feld *data* (ein Spark-RDD) auf die IndexFileEntry-Objekte zugreifen.
 ### preprocessing/GlobalUpdater.scala
 GlobalUpdater lädt die NetCDF Dateien, deren Pfade in einem IndexFile Objekt hinterlegt sind, in ein Spark RDD und nutzt dann ein NetCDFConverter-Obekt um relevante Daten aus diesen zu extrahieren und in der Datenbank zu speichern. <br/>
-Die Klasse ist auf Index-Files vom Typ GlobalIndex ausgerichtet. Soll ein WeeklyIndex gehandhabt haben sollte die Klasse WeeklyUpdater verwendet werden. <br/>
+Die Klasse ist auf Index-Files vom Typ GlobalIndex ausgerichtet. Soll ein WeeklyIndex gehandhabt wrden, sollte die Klasse WeeklyUpdater verwendet werden. 
+
+
 Die Methode *update* sortiert zu Beginn die Einträge des GlobalIndex nach derem "date"-Attribut. Anschließend ruft sie die Methode *processBucket(progress:Date)* auf, in welcher ein Teil ("Bucket") der Datenmenge abgearbeitet wird.<br/>
-Ist ein solcher Teilprozess erfolgreich abgeschlossen, wird das *date*-Feld des letzten Eintrags des Buckets in einer Collection/Table der Datenbank gespeichert. Anschließend ruft sich *processBucket* rekursiv auf und übergibt das zuletzt abgearbeitete Datum, welches als Startposition im sortierten GlobalIndex des nächsten Buckets verwendet wird. </br>
+Ist ein solcher Teilprozess erfolgreich abgeschlossen, wird das *date*-Feld des letzten Eintrags des Buckets in einer Collection/Table der Datenbank gespeichert. <br/> Anschließend ruft sich *processBucket* rekursiv auf und übergibt das zuletzt abgearbeitete Datum, welches als Startposition im sortierten GlobalIndex des nächsten Buckets verwendet wird. 
+
+
 Dieses Vorgehen ermöglicht es, im Falle eines vorzeitigem Beenden des Update-Prozesses, nicht wieder am Anfang des GlobalIndex mit dem Abarbeiten beginnen zu müssen. Stattdessen fragt die *update*-Methode das zuletzt gespeicherte Datum aus der Datenbank ab und übergibt dies an *processBucket*.
 
 ### preprocessing/WeeklyUpdater.scala
