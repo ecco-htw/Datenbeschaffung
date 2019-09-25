@@ -52,7 +52,9 @@ dem Nutzer des Programms ggf. eine sinnvolle Fehlermeldung zurückzugeben.
 ### main/RunProcedure.scala
 In 'RunProcedure' befindet sich das Object mit der *main*-Methode um das Programm zu starten.
 Wird das Programm gestartet, würd zunnächst ein "Global Update" durchgeführt. Es wird ein Objekt der Klasse "Global Updater" verwendet, um den Stand der Datenbank mit dem des FTP-Servers abzugleichen und alle in der DB fehlenden Einträge in dieser zu speichern (*globalUpdater.update()*).
+
 Nachdem das "Global Update" erfolgreich ausgeführt wurde, geht das Programm unter Verwendung des Ftp-Observers in einen Status über, in dem es in regelmäßigen Abständen nach einer neuen "Weekly List" vom FTP-Server fragt. 
+
 Existiert diese wird sie automatisch durch die Callback-Methode des Observers (*doWeeklyUpdate*) mithilfe eines Objekts der Klasse *WeeklyUpdater* heruntergeladen und ihre Inhalte in der DB gespeichert. 
 
 ### netcdfhandling/BuoyData.scala
