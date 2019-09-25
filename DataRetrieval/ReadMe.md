@@ -105,7 +105,7 @@ Der NetCDFConverter wird von anderen Klassen verwendet um die Daten aus den NetC
 Hier wird das NetCDFConverter Object konfiguriert, das zum konvertieren der NetCDF-Dateien verwendet wird.
 Dazu wird createNetCDFConverter aufgerufen mit folgender Datenstruktur:
 Seq( <br/>
-(conversionFunction, structField), <br\>
+(conversionFunction, structField), <br/>
 ... <br/>
 ) <br/>
 <br/>
@@ -117,11 +117,11 @@ structField definiert das schema zum Abspeichern in die Datenbank <br/>
 Hier noch ein paar Beispiele: <br/>
 
 ```
-(extractFirstProfile[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),<br/>
-(extractFirstProfile[Array[Char]]("FLOAT_SERIAL_NO", _.mkString.trim), StructField("floatSerialNo", StringType)),<br/>
-(extractFirstProfile[Array[Float]]("PRES", _.map(_.toDouble)), StructField("PRES", ArrayType(DoubleType))),<br/>
-(extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),<br/>
-((indexFileEntry: IndexFileEntry) => Some(indexFileEntry.date.str), StructField("dateUpdate", StringType))<br/>
+(extractFirstProfile[Int]("CYCLE_NUMBER"), StructField("cycleNumber", IntegerType)),
+(extractFirstProfile[Array[Char]]("FLOAT_SERIAL_NO", _.mkString.trim), StructField("floatSerialNo", StringType)),
+(extractFirstProfile[Array[Float]]("PRES", _.map(_.toDouble)), StructField("PRES", ArrayType(DoubleType))),
+(extractFirstProfile[Double]("LONGITUDE"), StructField("longitude", DoubleType)),
+((indexFileEntry: IndexFileEntry) => Some(indexFileEntry.date.str), StructField("dateUpdate", StringType))
 ```
 
 ### dataretrieval.observer/FtpObserver.scala
